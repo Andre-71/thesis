@@ -1,0 +1,15 @@
+Kalo sempet dan kalo udah cukup ke charge hp nya, cari tau tentang avaiability kosan amara dan kosan GC. -> Ga perlu ah, tetep bakal ngahuleng aku kalo ngekos
+
+Sniffing
+1. Buat ulang dibanding modif, karena biar ga banyak error
+2. Ikutin polanya yakni ada 2 class, karena bisa jadi ini best practicenya
+
+Aku tunda
+1. Mikirin bener ga aku ambil kursus devops
+2. Gimana rencana infra aku kedepannya
+
+Penyesalan
+Meragukan pak made, lalu menanyakan ke ChatGPT
+
+Besok
+Tanyain, berarti dengan adanya wifi usb dongle, delay yang besar akibat siklus perubahan konfigurasi di HP karena hanya ada 1 interface, teratasi berhubung bisa memiliki lebih dari 1 interface?
