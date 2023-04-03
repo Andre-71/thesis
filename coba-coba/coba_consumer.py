@@ -3,6 +3,7 @@ from fogverse import Consumer
 
 class TestConsumer(Consumer):
     def __init__(self):
+        self.siapa = "consumer"
         self.consumer_topic = "test"
         self.consumer_servers = "localhost:9093"
         Consumer.__init__(self)

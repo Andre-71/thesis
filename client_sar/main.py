@@ -36,42 +36,30 @@ class DroneConstumer(AbstractConsumer):
 class MyStorage(ConsumerStorage, DroneConstumer):
   def __init__(self):
     self.siapa = "consumer"
+    self.frame_size = (640, 480)
     ConsumerStorage.__init__(self)
     DroneConstumer.__init__(self)
   
   def process(self, data):
     data = super().process(data)
-    scale_percent = 70
-    width = int(data.shape[1] * scale_percent / 100)
-    height = int(data.shape[0] * scale_percent / 100)
-    dim = (width, height)
-    data = cv2.resize(data, dim)
+    data = cv2.resize(data, self.frame_size)
     return data
 
 class MyProducer(Producer):
   def __init__(self, consumer):
     self.siapa = "producer"
-    self.consumer = consumer
     self.producer_topic = "input"
     self.producer_servers = "localhost:9093"
-    self.frame_idx = 1
+    self.consumer = consumer
     Producer.__init__(self)
 
   async def receive(self):
     return await self.consumer.get()
 
-  async def send(self, data):
-    key = str(self.frame_idx).encode()
-    headers = [
-      ('timestamp', get_timestamp_str().encode())
-    ]
-    await super().send(data, key=key, headers=headers)
-    self.frame_idx += 1
-
 async def main():
   consumer = MyStorage()
-  producer = MyProducer(consumer=consumer)
-  tasks = [consumer.run(), producer.run()]
+  # producer = MyProducer(consumer=consumer)
+  tasks = [consumer.run()]
   try:
     await asyncio.gather(*tasks)
   except:
