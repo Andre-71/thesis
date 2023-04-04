@@ -1,13 +1,11 @@
-FROM muhandre/pytorch:v1.9-py3.6.9-yolov5-gpu
+FROM muhandre/pytorch:v1.10-py3.8.2-yolov5-cpu
 
 RUN --mount=type=cache,target=/var/cache/apt_update apt update \
-    && apt install -y --no-install-recommends \
+    && apt install -y \
     libssl-dev \
     zlib1g-dev \
-    curl \
     gcc \
     vim \
     g++
 
-RUN pip3 install --upgrade pip setuptools wheel
 RUN pip3 install pandas aiokafka

@@ -1,23 +1,24 @@
 import asyncio
 import torch
+import os
 
 from fogverse import Consumer, Producer, ConsumerStorage
 
 class MyStorage(Consumer, ConsumerStorage):
     def __init__(self, keep_messages=False):
         self.siapa = "consumer"
-        self.consumer_topic = ['input']
-        self.consumer_servers = "localhost:9093"
+        self.consumer_topic = os.getenv('CONSUMER_TOPIC', [])
+        self.consumer_servers = os.getenv('CONSUMER_SERVERS', "")
         Consumer.__init__(self)
         ConsumerStorage.__init__(self, keep_messages=keep_messages)
 
 class MyInferncer(Producer):
     def __init__(self, consumer):
         self.siapa = "producer"
-        MODEL = "yolov5n"
-        self.model = torch.hub.load('ultralytics/yolov5', MODEL, force_reload=True)
-        self.producer_topic = "result"
-        self.producer_servers = "localhost:9093"
+        MODEL = os.getenv('MODEL', 'yolov5n')
+        self.model = torch.hub.load('ultralytics/yolov5', MODEL)
+        self.producer_topic = os.getenv('PRODUCER_TOPIC', "")
+        self.producer_servers = os.getenv('PRODUCER_SERVERS', "")
         self.consumer = consumer
         Producer.__init__(self)
 

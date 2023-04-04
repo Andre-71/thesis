@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  client_sar:
+    image: try-tello
+    restart: always
+    ports:
+      - 8889:8889/udp
+      - 8890:8890/udp
+      - 11111:11111/udp
