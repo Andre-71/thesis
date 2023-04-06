@@ -1,19 +1,23 @@
 import asyncio
-from fogverse import Consumer, ConsumerStorage
+from fogverse import Consumer
 import cv2
 
-class MyConsumer(Consumer, ConsumerStorage):
+class MyConsumer(Consumer):
     def __init__(self, loop=None):
       self.siapa = "consumer"
-      self.consumer_topic = "input"
+      # === UNTUK TANPA DOCKER ===
       self.consumer_servers = "localhost:9093"
+      self.consumer_topic = "result"
+      # ======
       Consumer.__init__(self, loop=loop)
-      ConsumerStorage.__init__(self)
     
     def process(self, data):
       cv2.imshow("Image", data)
       cv2.waitKey(1)
       return data
+  
+    async def send(self, data):
+      pass
 
 async def main():
   consumer = MyConsumer()

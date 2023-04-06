@@ -58,8 +58,8 @@ class MyProducer(Producer):
 
 async def main():
   consumer = MyStorage()
-  # producer = MyProducer(consumer=consumer)
-  tasks = [consumer.run()]
+  producer = MyProducer(consumer=consumer)
+  tasks = [consumer.run(), producer.run()]
   try:
     await asyncio.gather(*tasks)
   except:

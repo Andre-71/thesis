@@ -1,6 +1,7 @@
 FROM muhandre/fogverse:inference-cpu
 
 WORKDIR /app
-COPY fog/inferencer/main.py .
+RUN pip install psutil
 COPY fogverse/ fogverse/
+COPY fog/inferencer/main.py .
 CMD ["python", "main.py"]

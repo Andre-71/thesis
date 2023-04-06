@@ -1,24 +1,30 @@
 import asyncio
 import torch
 import os
+import datetime
 
 from fogverse import Consumer, Producer, ConsumerStorage
+from fogverse.logging.logging import BaseLogging
 
 class MyStorage(Consumer, ConsumerStorage):
     def __init__(self, keep_messages=False):
         self.siapa = "consumer"
-        self.consumer_topic = os.getenv('CONSUMER_TOPIC', [])
-        self.consumer_servers = os.getenv('CONSUMER_SERVERS', "")
+        # === HANYA UNTUK CEK TANPA DOCKER ===
+        # self.consumer_servers="localhost:9093"
+        # self.consumer_topic="input"
+        # ======
         Consumer.__init__(self)
         ConsumerStorage.__init__(self, keep_messages=keep_messages)
 
 class MyInferncer(Producer):
     def __init__(self, consumer):
         self.siapa = "producer"
+        # === HANYA UNTUK CEK TANPA DOCKER ===
+        # self.producer_servers = "localhost:9093"
+        # self.producer_topic = "result"
+        # ======
         MODEL = os.getenv('MODEL', 'yolov5n')
         self.model = torch.hub.load('ultralytics/yolov5', MODEL)
-        self.producer_topic = os.getenv('PRODUCER_TOPIC', "")
-        self.producer_servers = os.getenv('PRODUCER_SERVERS', "")
         self.consumer = consumer
         Producer.__init__(self)
 
@@ -27,13 +33,17 @@ class MyInferncer(Producer):
 
     def _process(self, data):
         results = self.model(data)
-        print(results)
         return results.render()[0]
 
     async def process(self, data):
-        return await self._loop.run_in_executor(None,
+        now = datetime.datetime.now()
+        print("WAKTU SEBELUM PROCESS: " + str(now.time()))
+        process_result = await self._loop.run_in_executor(None,
                                                self._process,
                                                data)
+        now = datetime.datetime.now()
+        print("WAKTU SETELAH PROCESS: " + str(now.time()))
+        return process_result
 
 
 async def main():
