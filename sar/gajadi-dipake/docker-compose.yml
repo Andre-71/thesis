@@ -1,0 +1,7 @@
+version: "3"
+
+services:
+  client_sar:
+    image: muhandre/fogverse:sar
+    restart: always
+    network_mode: host
