@@ -1,13 +1,13 @@
 version: "3"
 
 services:
-  cloud2local-forwarder:
+  local2cloud-forwarder:
     image: muhandre/fogverse:forwarder
     volumes:
-      - ./logs/:/app/logs/
+      - ./local2cloud/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9093
-      - PRODUCER_SERVERS=<SERVER CLOUD>
+      - PRODUCER_SERVERS=34.101.148.109:9093
       - CONSUMER_TOPIC=preprocessed
       - PRODUCER_TOPIC=preprocessed
     restart: always

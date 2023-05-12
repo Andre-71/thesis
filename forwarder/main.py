@@ -6,9 +6,7 @@ from fogverse.logging import CsvLogging
 
 class MyForwarder(CsvLogging, Consumer, Producer):
     def __init__(self):
-        self.consumer_topic = ['result']
         self.consumer_conf = {'group_id': str(uuid.uuid4())}
-        self.producer_topic = 'result'
         self.auto_decode = False
         self.auto_encode = False
         CsvLogging.__init__(self)

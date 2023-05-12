@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  merger:
+    image: muhandre/fogverse:merger
+    volumes:
+      - ./logs/:/app/logs/
+    environment:
+      - CONSUMER_SERVERS=localhost:9093
+      - PRODUCER_SERVERS=localhost:9093
+    restart: always
+    network_mode: host

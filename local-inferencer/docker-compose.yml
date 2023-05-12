@@ -9,11 +9,11 @@ services:
       - CONSUMER_SERVERS=localhost:9093
       - PRODUCER_SERVERS=localhost:9093
       - CONSUMER_TOPIC=input
-      - SCENARIO=only local
+      - SCENARIO=with cloud
     restart: always
     network_mode: host
-    # deploy:
-    #   resources:
-    #     limits:
-    #       cpus: "0.75"
-    #       memory: 2800M
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 2800M
