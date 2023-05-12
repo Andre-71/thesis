@@ -76,21 +76,15 @@ class AIOKafkaProducer(AbstractProducer):
 
     async def send(self, data, topic=None, key=None, headers=None,
                    callback=None):
-        print(self.siapa + ": ini di send 1")
         key = key or getattr(self.message, 'key', None)
-        print(self.siapa + ": ini di send 2")
         self._headers = headers or getattr(self.message, 'headers', [])
-        print(self.siapa + ": ini di send 3")
         self._topic = topic or self.producer_topic
-        print(self.siapa + ": ini di send 4")
         if isinstance(self._headers, tuple):
             self._headers = list(self._headers)
-        print(self.siapa + ": ini di send 5")
         future = await self.producer.send(self._topic,
                                           key=key,
                                           value=data,
                                           headers=self._headers)
-        print(self.siapa + ": ini di send 6")
         callback = callback or getattr(self, 'callback', None)
         if not callable(callback): return future
         async def _call_callback_ack(args:list, kwargs:dict):

@@ -35,8 +35,6 @@ class Runnable:
         await _call_func_async(self, '_after_start')
         try:
             while True:
-                print(self.siapa + ": sebelum receive")
-
                 _call_func(self, '_before_receive')
                 self.message = await self.receive()
                 if self.message is None: continue
@@ -51,13 +49,9 @@ class Runnable:
                 else:
                     value = self.message.value
 
-                print(self.siapa + ": sebelum decode")
-
                 _call_func(self, '_before_decode', args=(value,))
                 data = self.decode(value)
                 _call_func(self, '_after_decode', args=(data,))
-
-                print(self.siapa + ": sebelum process")
 
                 _call_func(self, '_before_process', args=(data,))
                 result = self.process(data)
@@ -65,19 +59,14 @@ class Runnable:
                     result = await result
                 _call_func(self, '_after_process', args=(result,))
 
-                print(self.siapa + ": sebelum encode")
-
                 _call_func(self, '_before_encode', args=(result,))
                 result_bytes = self.encode(result)
                 _call_func(self, '_after_encode', args=(result_bytes,))
 
-                print(self.siapa + ": sebelum send")
-
                 _call_func(self, '_before_send', args=(result_bytes,))
                 await self.send(result_bytes)
                 _call_func(self, '_after_send', args=(result_bytes,))
-
-                print(self.siapa + ": setelah send")
+                
         except Exception as e:
             self.on_error(e)
         finally:

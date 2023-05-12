@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  local-inferencer:
+    image: muhandre/fogverse:local-inferencer
+    volumes:
+      - ./logs/:/app/logs/
+    environment:
+      - CONSUMER_SERVERS=localhost:9093
+      - PRODUCER_SERVERS=localhost:9093
+      - CONSUMER_TOPIC=input
+      - SCENARIO=only local
+    restart: always
+    network_mode: host
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: "0.75"
+    #       memory: 2800M
