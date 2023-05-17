@@ -5,7 +5,7 @@ class TestConsumer(Consumer):
     def __init__(self):
         self.siapa = "consumer"
         self.consumer_topic = "test"
-        self.consumer_servers = "localhost:9093"
+        self.consumer_servers = "localhost:9094"
         Consumer.__init__(self)
 
     async def send(self, data):

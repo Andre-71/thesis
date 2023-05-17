@@ -6,7 +6,7 @@ class MyConsumer(Consumer):
     def __init__(self, loop=None):
       self.siapa = "consumer"
       # === UNTUK TANPA DOCKER ===
-      self.consumer_servers = "localhost:9093"
+      self.consumer_servers = "localhost:9094"
       self.consumer_topic = "result"
       # ======
       Consumer.__init__(self, loop=loop)

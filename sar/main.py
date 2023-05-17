@@ -125,7 +125,7 @@ if __name__ == '__main__':
 #   def __init__(self, loop=None):
 #     self.siapa = "producer"
 #     self.producer_topic = "input"
-#     self.producer_servers = "localhost:9093"
+#     self.producer_servers = "localhost:9094"
 #     self.frame_idx = 1
 #     DroneConsumer.__init__(self, loop=loop)
 #     Producer.__init__(self, loop=loop)

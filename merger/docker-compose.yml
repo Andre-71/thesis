@@ -6,7 +6,7 @@ services:
     volumes:
       - ./logs/:/app/logs/
     environment:
-      - CONSUMER_SERVERS=localhost:9093
-      - PRODUCER_SERVERS=localhost:9093
+      - CONSUMER_SERVERS=localhost:9094
+      - PRODUCER_SERVERS=localhost:9094
     restart: always
     network_mode: host

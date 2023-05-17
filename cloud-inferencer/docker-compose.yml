@@ -6,13 +6,10 @@ services:
     volumes:
       - ./logs/:/app/logs/
     environment:
-      - CONSUMER_SERVERS=10.184.0.4:9093
-      - PRODUCER_SERVERS=10.184.0.4:9093
-      # - CONSUMER_SERVERS=localhost:9093
-      # - PRODUCER_SERVERS=localhost:9093
+      - CONSUMER_SERVERS=10.184.0.4:9092
+      - PRODUCER_SERVERS=10.184.0.4:9092
       - CONSUMER_TOPIC=preprocessed
       - PRODUCER_TOPIC=result
     restart: always
-    network_mode: host
     cpus: 0.75
     mem_limit: 500M

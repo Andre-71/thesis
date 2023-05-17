@@ -5,7 +5,7 @@ class TestProducer(Producer):
     def __init__(self):
         self.siapa = "producer"
         self.producer_topic = "test"
-        self.producer_servers = "localhost:9093"
+        self.producer_servers = "localhost:9094"
         self.counter = 100
         Producer.__init__(self)
 

@@ -1,18 +1,10 @@
-version: '3'
+version: "3"
 
 services:
   local-inferencer:
     image: muhandre/fogverse:try-client-local
     environment:
-    - CONSUMER_SERVERS=localhost:9093
-    - CONSUMER_TOPIC=result
+      - CONSUMER_SERVERS=localhost:9094
+      - CONSUMER_TOPIC=result
     restart: always
     network_mode: host
-    # deploy:
-    #   resources:
-    #     limits:
-    #       cpus: '0.75'
-    #       memory: 2800M
-    #     reservations:
-    #       devices:
-    #         - capabilities: [gpu]

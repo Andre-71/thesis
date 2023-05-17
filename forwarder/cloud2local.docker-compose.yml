@@ -6,8 +6,8 @@ services:
     volumes:
       - ./cloud2local/logs/:/app/logs/
     environment:
-      - CONSUMER_SERVERS=34.101.148.109:9093
-      - PRODUCER_SERVERS=localhost:9093
+      - CONSUMER_SERVERS=34.101.148.109:9095
+      - PRODUCER_SERVERS=localhost:9094
       - CONSUMER_TOPIC=result
       - PRODUCER_TOPIC=result
     restart: always

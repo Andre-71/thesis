@@ -4,7 +4,7 @@ from fogverse import Producer, Consumer
 class TestProducer(Producer):
     def __init__(self):
         self.producer_topic = "test"
-        self.producer_servers = "localhost:9093"
+        self.producer_servers = "localhost:904"
         self.counter = 50
         Producer.__init__(self)
 
@@ -17,7 +17,7 @@ class TestProducer(Producer):
 class TestConsumer(Consumer):
     def __init__(self):
         self.consumer_topic = "test"
-        self.consumer_servers = "localhost:9093"
+        self.consumer_servers = "localhost:9094"
         Consumer.__init__(self)
 
     async def send(self, data):
