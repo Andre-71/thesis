@@ -48,17 +48,12 @@ def drone_controller(drone):
     else:
       continue
 
-# def display_frame(frame):
-#   cv2.imshow("Image from UAV", frame)
-
 class DroneFrameConsumer(AbstractConsumer):
   def __init__(self, loop=None, executor=None):
     self._loop = loop or asyncio.get_event_loop()
     self._executor = executor
     self.auto_decode = False
     self.consumer = tello.Tello()
-    # self.consumer_frame_displayer = Thread(target=display_frame)
-    # self.consumer_frame_displayer.start()
   
   def start_consumer(self):
     self.consumer.connect()
