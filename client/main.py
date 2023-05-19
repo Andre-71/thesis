@@ -16,6 +16,7 @@ class MyClient(CsvLogging, Consumer):
       Consumer.__init__(self, loop=loop)
 
     def process(self, data):
+      # print(data)
       cv2.imshow("Final Image", data)
       cv2.waitKey(1)
       return data

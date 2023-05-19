@@ -4,19 +4,20 @@ import os
 
 from fogverse import Consumer, Producer, ConsumerStorage
 from fogverse.logging.logging import CsvLogging
-from fogverse.util import get_header
+from fogverse.util import get_header,  numpy_to_base64_url
 
-class MyStorage(Consumer, ConsumerStorage):
+class LocalInferencerStorage(Consumer, ConsumerStorage):
     def __init__(self, keep_messages=False):
         Consumer.__init__(self)
         ConsumerStorage.__init__(self, keep_messages=keep_messages)
 
-class MyLocalInferncer(CsvLogging, Producer):
+class LocalInferencer(CsvLogging, Producer):
     def __init__(self, consumer):
         model =  os.getenv('MODEL', 'yolov5n')
         self.model = torch.hub.load('ultralytics/yolov5', model)
         self.consumer = consumer
-        CsvLogging.__init__(self)
+        log_filename = f"logs/log_{self.__class__.__name__}_{os.getenv('SCENARIO', 'with_cloud')}.csv"
+        CsvLogging.__init__(self, filename=log_filename)
         Producer.__init__(self)
 
     async def receive(self):
@@ -31,13 +32,16 @@ class MyLocalInferncer(CsvLogging, Producer):
                                                self._process,
                                                data)
 
+    def encode(self, img):
+        return numpy_to_base64_url(img, os.getenv('ENCODING', 'jpg')).encode()
+    
     async def send(self, data):
         headers = list(self.message.headers)
         headers.append(('type',b'final'))
         await super().send(data, headers=headers)
 
 # ======================================================================
-class MyLocalInferencerOnlyLocal(MyLocalInferncer):
+class LocalInferencer1(LocalInferencer):
     def __init__(self, consumer):
         super().__init__(consumer)
 
@@ -49,18 +53,18 @@ class MyLocalInferencerOnlyLocal(MyLocalInferncer):
         self.producer_topic = f'final_{uav_id}'
         await super().send(data)
 # ======================================================================
-class MyLocalInferencerWithCloud(MyLocalInferncer):
+class LocalInferencer2(LocalInferencer):
     def __init__(self, consumer):
         self.producer_topic = 'result'
         super().__init__(consumer)
 
 scenarios = {
-    "only local": (MyStorage, MyLocalInferencerOnlyLocal),
-    "with cloud": (MyStorage, MyLocalInferencerWithCloud),
+    "only_local": (LocalInferencerStorage, LocalInferencer1),
+    "with_cloud": (LocalInferencerStorage, LocalInferencer2),
 }
 
 async def main():
-    scenario = os.getenv('SCENARIO', "with cloud")
+    scenario = os.getenv('SCENARIO', "with_cloud")
     _Consumer, _Producer = scenarios[scenario]
     consumer = _Consumer()
     producer = _Producer(consumer)

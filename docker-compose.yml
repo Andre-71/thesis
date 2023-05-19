@@ -1,0 +1,73 @@
+version: "3"
+
+services:
+  local-inferencer:
+    image: muhandre/fogverse:local-inferencer
+    volumes:
+      - ./local-inferencer/logs/:/app/logs/
+    environment:
+      - CONSUMER_SERVERS=localhost:9094
+      - PRODUCER_SERVERS=localhost:9094
+      - CONSUMER_TOPIC=input
+      - SCENARIO=with_cloud
+    restart: always
+    network_mode: host
+
+  local-preprocess:
+    image: muhandre/fogverse:local-preprocess
+    volumes:
+      - ./local-preprocess/logs/:/app/logs/
+    environment:
+      - CONSUMER_SERVERS=localhost:9094
+      - PRODUCER_SERVERS=localhost:9094
+      - CONSUMER_TOPIC=input
+      - PRODUCER_TOPIC=preprocessed
+    restart: always
+    network_mode: host
+
+  local2cloud-forwarder:
+    image: muhandre/fogverse:forwarder
+    volumes:
+      - ./forwarder/logs/local2cloud/:/app/logs/
+    environment:
+      - CONSUMER_SERVERS=localhost:9094
+      - PRODUCER_SERVERS=34.101.148.109:9095
+      - CONSUMER_TOPIC=preprocessed
+      - PRODUCER_TOPIC=preprocessed
+      - ROLE=local2cloud
+    restart: always
+    network_mode: host
+
+  cloud2local-forwarder:
+    image: muhandre/fogverse:forwarder
+    volumes:
+      - ./forwarder/logs/cloud2local/:/app/logs/
+    environment:
+      - CONSUMER_SERVERS=34.101.148.109:9095
+      - PRODUCER_SERVERS=localhost:9094
+      - CONSUMER_TOPIC=result
+      - PRODUCER_TOPIC=result
+      - ROLE=cloud2local
+    restart: always
+    network_mode: host
+
+  # merger:
+  #   image: muhandre/fogverse:merger
+  #   volumes:
+  #     - ./merger/logs/:/app/logs/
+  #   environment:
+  #     - CONSUMER_SERVERS=localhost:9094
+  #     - PRODUCER_SERVERS=localhost:9094
+  #   restart: always
+  #   network_mode: host
+
+  merger-kak-ariq:
+    image: muhandre/fogverse:merger-kak-ariq
+    volumes:
+      - ./merger-kak-ariq/logs/:/app/logs/
+    environment:
+      - CONSUMER_SERVERS=localhost:9094
+      - PRODUCER_SERVERS=localhost:9094
+      - WAIT_THRESH=4000
+    restart: always
+    network_mode: host

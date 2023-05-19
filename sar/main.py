@@ -1,7 +1,3 @@
-# ======================================================================
-# Versi pakai ConsumerStorage
-# -> Udah versi terbaik sejauh ini
-
 import asyncio
 from fogverse import Producer, AbstractConsumer, ConsumerStorage
 import cv2
@@ -11,15 +7,62 @@ from fogverse.util import get_timestamp_str
 import os
 from dotenv import load_dotenv
 import uuid
+from threading import Thread
+import keyboard
 
-class DroneConstumer(AbstractConsumer):
+def drone_controller(drone):
+  takeoff_status = False
+  while True:
+    if takeoff_status == False and keyboard.is_pressed("f"):
+      print("f key pressed")
+      drone.takeoff()
+      takeoff_status = True
+    elif takeoff_status == True and keyboard.is_pressed("w"):
+      print("w key pressed")
+      drone.move_forward(30)
+    elif takeoff_status == True and keyboard.is_pressed("s"):
+      print("s key pressed")
+      drone.move_back(30)
+    elif takeoff_status == True and keyboard.is_pressed("a"):
+      print("a key pressed")
+      drone.move_left(30)
+    elif takeoff_status == True and keyboard.is_pressed("d"):
+      print("d key pressed")
+      drone.move_right(30)
+    elif takeoff_status == True and keyboard.is_pressed("l"):
+      print("l key pressed")
+      drone.rotate_clockwise(30)
+    elif takeoff_status == True and keyboard.is_pressed("j"):
+      print("j key pressed")
+      drone.rotate_counter_clockwise(30)
+    elif takeoff_status == True and keyboard.is_pressed("i"):
+      print("i key pressed")
+      drone.move_up(30)
+    elif takeoff_status == True and keyboard.is_pressed("k"):
+      print("k key pressed")
+      drone.move_down(30)
+    elif takeoff_status == True and keyboard.is_pressed("h"):
+      print("h key pressed")
+      drone.land()
+      takeoff_status = False
+    else:
+      continue
+
+# def display_frame(frame):
+#   cv2.imshow("Image from UAV", frame)
+
+class DroneFrameConsumer(AbstractConsumer):
   def __init__(self, loop=None, executor=None):
     self._loop = loop or asyncio.get_event_loop()
     self._executor = executor
+    self.auto_decode = False
     self.consumer = tello.Tello()
+    # self.consumer_frame_displayer = Thread(target=display_frame)
+    # self.consumer_frame_displayer.start()
   
   def start_consumer(self):
     self.consumer.connect()
+    Thread(target=drone_controller, args=(self.consumer, )).start()
     self.consumer.streamon()
 
   def _receive(self):
@@ -37,10 +80,10 @@ class DroneConstumer(AbstractConsumer):
     self.consumer.streamoff()
     self.consumer.end()
 
-class MyStorage(DroneConstumer, ConsumerStorage):
+class FrameProducerStorage(DroneFrameConsumer, ConsumerStorage):
   def __init__(self):
     self.frame_size = (640, 480)
-    DroneConstumer.__init__(self)
+    DroneFrameConsumer.__init__(self)
     ConsumerStorage.__init__(self)
   
   def process(self, data):
@@ -48,14 +91,13 @@ class MyStorage(DroneConstumer, ConsumerStorage):
     data = cv2.resize(data, self.frame_size)
     return data
 
-class MyProducer(CsvLogging, Producer):
+class FrameProducer(CsvLogging, Producer):
   def __init__(self, consumer, loop=None):
     self.consumer = consumer
     self.uav_id = f"uav_{os.getenv('UAV_ID', str(uuid.uuid4()))}"
-    self.producer_topic = "input"
-    self.producer_servers = os.getenv('PRODUCER_SERVERS')
     self.frame_idx = 1
-    CsvLogging.__init__(self)
+    log_filename = f"logs/log_{self.__class__.__name__}_{os.getenv('SCENARIO', 'with_cloud')}.csv"
+    CsvLogging.__init__(self, filename=log_filename)
     Producer.__init__(self, loop=loop)
 
   async def receive(self):
@@ -71,8 +113,8 @@ class MyProducer(CsvLogging, Producer):
     self.frame_idx += 1
 
 async def main():
-  consumer = MyStorage()
-  producer = MyProducer(consumer=consumer)
+  consumer = FrameProducerStorage()
+  producer = FrameProducer(consumer=consumer)
   tasks = [consumer.run(), producer.run()]
   try:
     await asyncio.gather(*tasks)
@@ -83,77 +125,3 @@ async def main():
 if __name__ == '__main__':
   load_dotenv()
   asyncio.run(main())
-
-# ======================================================================
-# Versi ga pakai ConsumerStorage 
-# -> Udah versi terbaik sejauh ini
-# -> Setelah sadar kalo ConsumerStorage penting untuk menjaga barangkali producer sedang ada masalah,
-# -> namun consumer baiknya tetep jalan, ternyata ini ga kepake lagi.
-
-# import asyncio
-# from fogverse import Producer, AbstractConsumer
-# import cv2
-# from djitellopy import tello
-# from fogverse.util import get_timestamp_str
-
-# class DroneConsumer(AbstractConsumer):
-#   def __init__(self, loop=None, executor=None):
-#     self._loop = loop or asyncio.get_event_loop()
-#     self._executor = executor
-#     self.consumer = tello.Tello()
-  
-#   def start_consumer(self):
-#     self.consumer.connect()
-#     self.consumer.streamon()
-
-#   def _receive(self):
-#     return self.consumer.get_frame_read().frame
-
-#   async def receive(self):
-#     return await self._loop.run_in_executor(self._executor, self._receive)
-
-#   def process(self, data):
-#     cv2.imshow("Image", data)
-#     cv2.waitKey(1)
-#     return data
-
-#   def close_consumer(self):
-#     self.consumer.streamoff()
-#     self.consumer.end()
-
-# class MyProducer(DroneConsumer, Producer):
-#   def __init__(self, loop=None):
-#     self.siapa = "producer"
-#     self.producer_topic = "input"
-#     self.producer_servers = "localhost:9094"
-#     self.frame_idx = 1
-#     DroneConsumer.__init__(self, loop=loop)
-#     Producer.__init__(self, loop=loop)
-  
-#   def process(self, data):
-#     data = super().process(data)
-#     scale_percent = 71
-#     width = int(data.shape[1] * scale_percent / 100)
-#     height = int(data.shape[0] * scale_percent / 100)
-#     dim = (width, height)
-#     return cv2.resize(data, dim)
-  
-#   async def send(self, data):
-#     key = str(self.frame_idx).encode()
-#     headers = [
-#       ('timestamp', get_timestamp_str().encode())
-#     ]
-#     await super().send(data, key=key, headers=headers)
-#     self.frame_idx += 1
-
-# async def main():
-#   producer = MyProducer()
-#   tasks = [producer.run()]
-#   try:
-#     await asyncio.gather(*tasks)
-#   except:
-#     for t in tasks:
-#       t.close()
-
-# if __name__ == '__main__':
-#   asyncio.run(main())
