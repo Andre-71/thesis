@@ -73,7 +73,8 @@ print("UDP server up and listening")
 
 while True:
     data, addr = UDPServerSocket.recvfrom(bufferSize)
-    print("Client address: ", addr)
+    # print("Client address: ", addr)
+    # print("The data: ", data)
 
     loaded = np.load(BytesIO(data))
 

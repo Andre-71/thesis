@@ -9,7 +9,6 @@ from flask_socketio import SocketIO
 from dotenv import load_dotenv
 
 from fogverse.logging import CsvLogging
-from fogverse.util import recover_encoding
 
 def page_not_found(*args):
   return render_template('404.html'), 404
