@@ -1,5 +1,5 @@
 FROM muhandre/fogverse:master
 WORKDIR /app
 COPY fogverse/ fogverse/
-COPY local-preprocess/main.py .
+COPY local-preprocessor/main.py .
 CMD ["python", "main.py"]

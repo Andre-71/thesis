@@ -14,9 +14,9 @@ services:
     network_mode: host
 
   local-preprocess:
-    image: muhandre/fogverse:local-preprocess
+    image: muhandre/fogverse:local-preprocessor
     volumes:
-      - ./local-preprocess/logs/:/app/logs/
+      - ./local-preprocessor/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094
