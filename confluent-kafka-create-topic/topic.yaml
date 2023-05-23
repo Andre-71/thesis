@@ -3,7 +3,7 @@ server:
 
 topic:
   input:
-    partitions: 2
+    partitions: 1
     server:
       - local_kafka
     config:
@@ -25,6 +25,13 @@ topic:
       segment.bytes: 10000000
       segment.ms: 1200
   final_uav_1:
+    partitions: 1
+    server: local_kafka
+    config:
+      retention.ms: 5000
+      segment.bytes: 10000000
+      segment.ms: 1200
+  final_uav_2:
     partitions: 1
     server: local_kafka
     config:
