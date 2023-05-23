@@ -6,7 +6,7 @@ import uuid
 from fogverse import ConsumerStorage, Producer, Consumer
 from fogverse.util import (
     calc_datetime, compress_encoding, get_timestamp, get_timestamp_str,
-    recover_encoding, timestamp_to_datetime
+    numpy_to_base64_url, recover_encoding, timestamp_to_datetime
 )
 from util import box_label
 
@@ -99,7 +99,7 @@ class MyConsumerStorage(Consumer, ConsumerStorage):
             if _delay > uav_data['max_delay']:
                 uav_data['max_delay'] = max(uav_data['max_delay'],_delay)
                 uav_data['max_delay_frame'] = frame_idx
-            _data['data'] = frame
+            _data['data'] = numpy_to_base64_url(frame, ENCODING)
             _data['message'].headers = self.message.headers
             _data['type'] = 'final'
             _data['from'] = 'cloud'
@@ -165,7 +165,6 @@ def print_send_data(send_data):
             else:
                 print(f'{indent}{attr_uav}: {value_uav}')
 
-
 class MyProducer(Producer):
     def __init__(self, consumer_storage, loop=None):
         self.consumer = consumer_storage
@@ -185,7 +184,7 @@ class MyProducer(Producer):
         data = self.data
         await asyncio.sleep(self.thresh / 1e3)
         return data
-
+    
     async def send(self, data):
         return data
 
@@ -219,7 +218,7 @@ class MyProducer(Producer):
 
     def _send(self, uav_id, data, headers):
         topic = f'final_{uav_id}'
-        task = super().send(data, topic=topic, headers=headers)
+        task = super().send(data.encode(), topic=topic, headers=headers)
         self._loop.create_task(task)
 
     async def send(self, data):

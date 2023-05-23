@@ -9,7 +9,7 @@ services:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094
       - CONSUMER_TOPIC=input
-      - SCENARIO=only_local
+      - SCENARIO=with_cloud
     restart: always
     network_mode: host
 
@@ -51,10 +51,10 @@ services:
     restart: always
     network_mode: host
 
-  merger-kak-ariq:
-    image: muhandre/fogverse:merger-kak-ariq
+  merger:
+    image: muhandre/fogverse:merger
     volumes:
-      - ./merger-kak-ariq/logs/:/app/logs/
+      - ./merger/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094
