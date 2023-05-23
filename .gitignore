@@ -2,3 +2,4 @@ env
 build
 dist
 fogverse.egg-info
+.vscode
