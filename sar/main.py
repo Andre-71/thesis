@@ -58,22 +58,13 @@ class DroneFrameConsumer(AbstractConsumer):
     self.auto_decode = False
     self.consumer = tello.Tello()
     self.battery_consumption_logger_csvfilename = f"logs/log_sardevice_battery_{os.getenv('ATTEMPT')}.csv"
-    self.battery_consumption_logger(self.battery_consumption_logger_csvfilename, ['time', 'battery_percentage'])
-  
-  def battery_consumption_logger(self, filename, data):
-    '''
-    Reference
-    1. https://www.pythontutorial.net/python-basics/python-write-csv-file/
-    2. https://www.geeksforgeeks.org/python-script-to-show-laptop-battery-percentage/
-    '''
-
-    with open(filename, 'w', encoding='UTF8', newline='') as f:
-      writer = csv.writer(f)
-      writer.writerow(data)
+    self.battery_consumption_logger = csv.writer(open(self.battery_consumption_logger_csvfilename, 
+      'w', encoding='UTF8', newline=''))
+    self.battery_consumption_logger.writerow(['time', 'battery_percentage'])
         
   def start_consumer(self):
     battery_consumption_data = [get_timestamp_str(), psutil.sensors_battery().percent]
-    self.battery_consumption_logger(self.battery_consumption_logger_csvfilename, battery_consumption_data)
+    self.battery_consumption_logger.writerow(battery_consumption_data)
     self.consumer.connect()
     # Thread(target=drone_controller, args=(self.consumer, )).start()
     self.consumer.streamon()
@@ -93,7 +84,8 @@ class DroneFrameConsumer(AbstractConsumer):
     self.consumer.streamoff()
     self.consumer.end()
     battery_consumption_data = [get_timestamp_str(), psutil.sensors_battery().percent]
-    self.battery_consumption_logger(self.battery_consumption_logger_csvfilename, battery_consumption_data)
+    self.battery_consumption_logger.writerow(battery_consumption_data)
+    self.battery_consumption_logger.close()
 
 class FrameProducerStorage(DroneFrameConsumer, ConsumerStorage):
   def __init__(self):
