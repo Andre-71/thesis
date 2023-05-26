@@ -14,7 +14,7 @@ class CloudInferencerStorage(Consumer, ConsumerStorage):
 class CloudInferencer(CsvLogging, Producer):
   def __init__(self, consumer):
     model = os.getenv('MODEL', 'yolov5n')
-    self.model = torch.hub.load('ultralytics/yolov5', model)
+    self.model = torch.hub.load('ultralytics/yolov5', model, device='gpu')
     self.consumer = consumer
     log_filename = f"logs/log_{self.__class__.__name__} \
                         _with_cloud \

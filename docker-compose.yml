@@ -32,7 +32,7 @@ services:
   local2cloud-forwarder:
     image: muhandre/fogverse:forwarder
     volumes:
-      - ./forwarder/logs/local2cloud/:/app/logs/
+      - ./forwarder/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=34.101.148.109:9095
@@ -47,7 +47,7 @@ services:
   cloud2local-forwarder:
     image: muhandre/fogverse:forwarder
     volumes:
-      - ./forwarder/logs/cloud2local/:/app/logs/
+      - ./forwarder/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=34.101.148.109:9095
       - PRODUCER_SERVERS=localhost:9094
