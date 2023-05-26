@@ -7,7 +7,7 @@ from fogverse.util import get_timestamp_str
 import os
 from dotenv import load_dotenv
 import uuid
-from threading import Thread
+from threading import Thread, Event
 import keyboard
 import psutil
 import time
@@ -51,22 +51,29 @@ def drone_controller(drone):
     else:
       continue
 
+def battery_consumption_logger(event):
+  battery_consumption_logger_csvfilename = f"logs/log_sardevice_battery_{os.getenv('ATTEMPT')}.csv"
+  with open(battery_consumption_logger_csvfilename, 'w', encoding='UTF8', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(['time', 'battery_percentage'])
+    while True:
+      if event.is_set():
+        break
+      writer.writerow([get_timestamp_str(), psutil.sensors_battery().percent])
+      time.sleep(1)
+
 class DroneFrameConsumer(AbstractConsumer):
   def __init__(self, loop=None, executor=None):
     self._loop = loop or asyncio.get_event_loop()
     self._executor = executor
     self.auto_decode = False
     self.consumer = tello.Tello()
-    self.battery_consumption_logger_csvfilename = f"logs/log_sardevice_battery_{os.getenv('ATTEMPT')}.csv"
-    self.battery_consumption_logger = csv.writer(open(self.battery_consumption_logger_csvfilename, 
-      'w', encoding='UTF8', newline=''))
-    self.battery_consumption_logger.writerow(['time', 'battery_percentage'])
         
   def start_consumer(self):
-    battery_consumption_data = [get_timestamp_str(), psutil.sensors_battery().percent]
-    self.battery_consumption_logger.writerow(battery_consumption_data)
+    self.event = Event()
+    Thread(target=battery_consumption_logger, args=(self.event,)).start()
     self.consumer.connect()
-    # Thread(target=drone_controller, args=(self.consumer, )).start()
+    Thread(target=drone_controller, args=(self.consumer, )).start()
     self.consumer.streamon()
 
   def _receive(self):
@@ -81,11 +88,9 @@ class DroneFrameConsumer(AbstractConsumer):
     return data
 
   def close_consumer(self):
+    self.event.set()
     self.consumer.streamoff()
     self.consumer.end()
-    battery_consumption_data = [get_timestamp_str(), psutil.sensors_battery().percent]
-    self.battery_consumption_logger.writerow(battery_consumption_data)
-    self.battery_consumption_logger.close()
 
 class FrameProducerStorage(DroneFrameConsumer, ConsumerStorage):
   def __init__(self):
@@ -121,8 +126,8 @@ class FrameProducer(CsvLogging, Producer):
 
 async def main():
   consumer = FrameProducerStorage()
-  # producer = FrameProducer(consumer=consumer)
-  # tasks = [consumer.run(), producer.run()]
+  producer = FrameProducer(consumer=consumer)
+  tasks = [consumer.run(), producer.run()]
   tasks = [consumer.run()]
   try:
     await asyncio.gather(*tasks)
