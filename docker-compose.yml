@@ -61,9 +61,13 @@ services:
 
   merger:
     image: muhandre/fogverse:merger
+    volumes:
+      - ./merger/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094
       - WAIT_THRESH=4000
+      - UAV_COUNT=1
+      - ATTEMPT=1
     restart: always
     network_mode: host

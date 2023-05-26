@@ -8,6 +8,7 @@ from fogverse.util import (
     calc_datetime, compress_encoding, get_timestamp, get_timestamp_str,
     numpy_to_base64_url, recover_encoding, timestamp_to_datetime
 )
+from fogverse.logging.logging import CsvLogging
 from util import box_label
 
 ENCODING = os.getenv('ENCODING', 'jpg')
@@ -23,7 +24,7 @@ class KeyWrapper:
     def __len__(self):
         return len(self.it)
 
-class MyConsumerStorage(Consumer, ConsumerStorage):
+class MergerStorage(Consumer, ConsumerStorage):
     def __init__(self):
         self.consumer_topic = ['input', 'result']
         self.consumer_conf = {'group_id': str(uuid.uuid4())}
@@ -165,7 +166,7 @@ def print_send_data(send_data):
             else:
                 print(f'{indent}{attr_uav}: {value_uav}')
 
-class MyProducer(Producer):
+class MergerProducer(Producer, CsvLogging):
     def __init__(self, consumer_storage, loop=None):
         self.consumer = consumer_storage
         self.auto_decode = False
@@ -174,6 +175,10 @@ class MyProducer(Producer):
         self.n_avg_delay = 0
         self.thresh = int(os.getenv('WAIT_THRESH', 2000))
         self._loop = loop or asyncio.get_event_loop()
+        log_filename = f"logs/log_{self.__class__.__name__} \
+                        _{os.getenv('UAV_COUNT')}_uav \
+                        _attempt_{os.getenv('ATTEMPT')}.csv"
+        CsvLogging.__init__(self, filename=log_filename)
         Producer.__init__(self)
 
     @property
@@ -243,8 +248,8 @@ class MyProducer(Producer):
                                       _data, headers)
 
 async def main():
-    consumer = MyConsumerStorage()
-    producer = MyProducer(consumer)
+    consumer = MergerStorage()
+    producer = MergerProducer(consumer)
     tasks = [consumer.run(), producer.run()]
     try:
         await asyncio.gather(*tasks)
