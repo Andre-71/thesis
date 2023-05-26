@@ -9,6 +9,9 @@ from dotenv import load_dotenv
 import uuid
 from threading import Thread
 import keyboard
+import psutil
+import time
+import csv
 
 def drone_controller(drone):
   takeoff_status = False
@@ -54,10 +57,25 @@ class DroneFrameConsumer(AbstractConsumer):
     self._executor = executor
     self.auto_decode = False
     self.consumer = tello.Tello()
+    self.battery_consumption_logger_csvfilename = f"logs/log_sardevice_battery_{os.getenv('ATTEMPT')}.csv"
+    self.battery_consumption_logger(self.battery_consumption_logger_csvfilename, ['time', 'battery_percentage'])
   
+  def battery_consumption_logger(self, filename, data):
+    '''
+    Reference
+    1. https://www.pythontutorial.net/python-basics/python-write-csv-file/
+    2. https://www.geeksforgeeks.org/python-script-to-show-laptop-battery-percentage/
+    '''
+
+    with open(filename, 'w', encoding='UTF8', newline='') as f:
+      writer = csv.writer(f)
+      writer.writerow(data)
+        
   def start_consumer(self):
+    battery_consumption_data = [get_timestamp_str(), psutil.sensors_battery().percent]
+    self.battery_consumption_logger(self.battery_consumption_logger_csvfilename, battery_consumption_data)
     self.consumer.connect()
-    Thread(target=drone_controller, args=(self.consumer, )).start()
+    # Thread(target=drone_controller, args=(self.consumer, )).start()
     self.consumer.streamon()
 
   def _receive(self):
@@ -74,6 +92,8 @@ class DroneFrameConsumer(AbstractConsumer):
   def close_consumer(self):
     self.consumer.streamoff()
     self.consumer.end()
+    battery_consumption_data = [get_timestamp_str(), psutil.sensors_battery().percent]
+    self.battery_consumption_logger(self.battery_consumption_logger_csvfilename, battery_consumption_data)
 
 class FrameProducerStorage(DroneFrameConsumer, ConsumerStorage):
   def __init__(self):
@@ -109,8 +129,9 @@ class FrameProducer(CsvLogging, Producer):
 
 async def main():
   consumer = FrameProducerStorage()
-  producer = FrameProducer(consumer=consumer)
-  tasks = [consumer.run(), producer.run()]
+  # producer = FrameProducer(consumer=consumer)
+  # tasks = [consumer.run(), producer.run()]
+  tasks = [consumer.run()]
   try:
     await asyncio.gather(*tasks)
   except:
