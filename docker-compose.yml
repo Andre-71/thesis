@@ -14,6 +14,11 @@ services:
       - ATTEMPT=1
     restart: always
     network_mode: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
 
   local-preprocess:
     image: muhandre/fogverse:local-preprocessor
