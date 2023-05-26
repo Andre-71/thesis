@@ -23,7 +23,7 @@ class MyClient(CsvLogging, Consumer):
         self.auto_encode = False
         self.consumer_conf = {'group_id': str(uuid.uuid4())}
         self.topic_pattern = os.getenv('TOPIC_PATTERN')
-        log_filename = f"logs/log_{self.__class__.__name__}_{os.getenv('SCENARIO', 'with_cloud')}.csv"
+        log_filename = f"logs/log_{self.__class__.__name__}_{os.getenv('ARCHITECTURE', 'with_cloud')}.csv"
         CsvLogging.__init__(self, filename=log_filename)
         Consumer.__init__(self,loop=loop)
 

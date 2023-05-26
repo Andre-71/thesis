@@ -9,7 +9,11 @@ class LocalForwarder(CsvLogging, Consumer, Producer):
     def __init__(self):
         self.auto_decode = False
         self.auto_encode = False
-        CsvLogging.__init__(self)
+        log_filename = f"logs/log_{self.__class__.__name__} \
+                        _{os.getenv('ROLE')} \
+                        _{os.getenv('UAV_COUNT')}_uav \
+                        _attempt_{os.getenv('ATTEMPT')}.csv"
+        CsvLogging.__init__(self, filename=log_filename)
         Consumer.__init__(self)
         Producer.__init__(self)
 
@@ -19,14 +23,14 @@ class LocalForwarder2(LocalForwarder):
         self.consumer_conf = {'group_id': str(uuid.uuid4())}
         super().__init__()
 
-roles = {
+ROLES = {
     "local2cloud": LocalForwarder,
     "cloud2local": LocalForwarder2,
 }
 
 async def main():
-    scenario = os.getenv('ROLE')
-    _Forwarder = roles[scenario]
+    role = os.getenv('ROLE')
+    _Forwarder = ROLES[role]
     Forwarder = _Forwarder()
     tasks = [Forwarder.run()]
     try:

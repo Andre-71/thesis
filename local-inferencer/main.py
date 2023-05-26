@@ -16,7 +16,10 @@ class LocalInferencer(CsvLogging, Producer):
         model =  os.getenv('MODEL', 'yolov5n')
         self.model = torch.hub.load('ultralytics/yolov5', model)
         self.consumer = consumer
-        log_filename = f"logs/log_{self.__class__.__name__}_{os.getenv('SCENARIO', 'with_cloud')}.csv"
+        log_filename = f"logs/log_{self.__class__.__name__} \
+                        _{os.getenv('ARCHITECTURE')} \
+                        _{os.getenv('UAV_COUNT')}_uav \
+                        _attempt_{os.getenv('ATTEMPT')}.csv"
         CsvLogging.__init__(self, filename=log_filename)
         Producer.__init__(self)
 
@@ -58,14 +61,14 @@ class LocalInferencer2(LocalInferencer):
         self.producer_topic = 'result'
         super().__init__(consumer)
 
-scenarios = {
+ARCHITECTURES = {
     "only_local": (LocalInferencerStorage, LocalInferencer1),
     "with_cloud": (LocalInferencerStorage, LocalInferencer2),
 }
 
 async def main():
-    scenario = os.getenv('SCENARIO', "with_cloud")
-    _Consumer, _Producer = scenarios[scenario]
+    architeture = os.getenv('ARCHITECTURE', "with_cloud")
+    _Consumer, _Producer = ARCHITECTURES[architeture]
     consumer = _Consumer()
     producer = _Producer(consumer)
     tasks = [consumer.run(), producer.run()]

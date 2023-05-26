@@ -5,8 +5,8 @@ server:
 topic:
   input:
     ### Just choose one "partitions" options. Don't forget to comment the other option.
-    partitions: 2 # for with_cloud scenario. 
-    # partitions: 1 # for only_local scenario.
+    partitions: 2 # for with_cloud ARCHITECTURE. 
+    # partitions: 1 # for only_local ARCHITECTURE.
     server:
       - local_kafka
     config:
@@ -33,7 +33,7 @@ topic:
   #     segment.bytes: 10000000
   #     segment.ms: 1200
 
-  ### with_cloud scenario topics
+  ### with_cloud ARCHITECTURE topics
   preprocessed:
     partitions: 1
     server:

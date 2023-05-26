@@ -6,17 +6,21 @@ import numpy as np
 from fogverse import Consumer, Producer, ConsumerStorage
 from fogverse.logging.logging import CsvLogging
 
-class MyStorage(Consumer, ConsumerStorage):
+class CloudInferencerStorage(Consumer, ConsumerStorage):
   def __init__(self, keep_messages=False):
     Consumer.__init__(self)
     ConsumerStorage.__init__(self, keep_messages=keep_messages)
 
-class MyCloud(CsvLogging, Producer):
+class CloudInferencer(CsvLogging, Producer):
   def __init__(self, consumer):
     model = os.getenv('MODEL', 'yolov5n')
     self.model = torch.hub.load('ultralytics/yolov5', model)
     self.consumer = consumer
-    CsvLogging.__init__(self)
+    log_filename = f"logs/log_{self.__class__.__name__} \
+                        _with_cloud \
+                        _{os.getenv('UAV_COUNT')}_uav \
+                        _attempt_{os.getenv('ATTEMPT')}.csv"
+    CsvLogging.__init__(self, filename=log_filename)
     Producer.__init__(self)
 
   async def receive(self):
@@ -47,8 +51,8 @@ class MyCloud(CsvLogging, Producer):
     await super().send(data, headers=headers)
 
 async def main():
-    consumer = MyStorage()
-    producer = MyCloud(consumer)
+    consumer = CloudInferencerStorage()
+    producer = CloudInferencer(consumer)
     tasks = [consumer.run(), producer.run()]
     try:
         await asyncio.gather(*tasks)

@@ -1,7 +1,7 @@
 BASE_PATH="/mnt/c/Users/Muhammad Andre G/Downloads/Kuliah stuff/Kuliah/SKRIPSI/Exploration Phase/thesis"
-SCENARIO=$1
+ARCHITECTURE=$1
 VERSION=$2
-DEST=$BASE_PATH/data-analysis/$SCENARIO/$VERSION
+DEST=$BASE_PATH/data-analysis/$ARCHITECTURE/$VERSION
 
 case $1 in
   "only local")
@@ -11,6 +11,6 @@ case $1 in
   ;;
 
   *)
-    echo "unknown scenario"
+    echo "unknown ARCHITECTURE"
   ;;
 esac

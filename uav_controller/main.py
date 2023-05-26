@@ -13,46 +13,49 @@ import psutil
 import time
 import csv
 
-def drone_controller(drone):
+def uav_controller(uav):
   takeoff_status = False
   while True:
     if takeoff_status == False and keyboard.is_pressed("f"):
       print("f key pressed")
-      drone.takeoff()
+      uav.takeoff()
       takeoff_status = True
     elif takeoff_status == True and keyboard.is_pressed("w"):
       print("w key pressed")
-      drone.move_forward(30)
+      uav.move_forward(30)
     elif takeoff_status == True and keyboard.is_pressed("s"):
       print("s key pressed")
-      drone.move_back(30)
+      uav.move_back(30)
     elif takeoff_status == True and keyboard.is_pressed("a"):
       print("a key pressed")
-      drone.move_left(30)
+      uav.move_left(30)
     elif takeoff_status == True and keyboard.is_pressed("d"):
       print("d key pressed")
-      drone.move_right(30)
+      uav.move_right(30)
     elif takeoff_status == True and keyboard.is_pressed("l"):
       print("l key pressed")
-      drone.rotate_clockwise(30)
+      uav.rotate_clockwise(30)
     elif takeoff_status == True and keyboard.is_pressed("j"):
       print("j key pressed")
-      drone.rotate_counter_clockwise(30)
+      uav.rotate_counter_clockwise(30)
     elif takeoff_status == True and keyboard.is_pressed("i"):
       print("i key pressed")
-      drone.move_up(30)
+      uav.move_up(30)
     elif takeoff_status == True and keyboard.is_pressed("k"):
       print("k key pressed")
-      drone.move_down(30)
+      uav.move_down(30)
     elif takeoff_status == True and keyboard.is_pressed("h"):
       print("h key pressed")
-      drone.land()
+      uav.land()
       takeoff_status = False
     else:
       continue
 
 def battery_consumption_logger(event):
-  battery_consumption_logger_csvfilename = f"logs/log_sardevice_battery_{os.getenv('ATTEMPT')}.csv"
+  battery_consumption_logger_csvfilename = f"logs/log_uavcontrollerdevice_battery_consumption \
+                                          _{os.getenv('ARCHITECTURE')} \
+                                          _{os.getenv('UAV_COUNT')}_uav \
+                                          _attempt_{os.getenv('ATTEMPT')}.csv"
   with open(battery_consumption_logger_csvfilename, 'w', encoding='UTF8', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(['time', 'battery_percentage'])
@@ -62,7 +65,7 @@ def battery_consumption_logger(event):
       writer.writerow([get_timestamp_str(), psutil.sensors_battery().percent])
       time.sleep(1)
 
-class DroneFrameConsumer(AbstractConsumer):
+class UAVFrameConsumer(AbstractConsumer):
   def __init__(self, loop=None, executor=None):
     self._loop = loop or asyncio.get_event_loop()
     self._executor = executor
@@ -73,7 +76,7 @@ class DroneFrameConsumer(AbstractConsumer):
     self.event = Event()
     Thread(target=battery_consumption_logger, args=(self.event,)).start()
     self.consumer.connect()
-    Thread(target=drone_controller, args=(self.consumer, )).start()
+    Thread(target=uav_controller, args=(self.consumer, )).start()
     self.consumer.streamon()
 
   def _receive(self):
@@ -92,10 +95,10 @@ class DroneFrameConsumer(AbstractConsumer):
     self.consumer.streamoff()
     self.consumer.end()
 
-class FrameProducerStorage(DroneFrameConsumer, ConsumerStorage):
+class UAVFrameProducerStorage(UAVFrameConsumer, ConsumerStorage):
   def __init__(self):
     self.frame_size = (640, 480)
-    DroneFrameConsumer.__init__(self)
+    UAVFrameConsumer.__init__(self)
     ConsumerStorage.__init__(self)
   
   def process(self, data):
@@ -103,12 +106,15 @@ class FrameProducerStorage(DroneFrameConsumer, ConsumerStorage):
     data = cv2.resize(data, self.frame_size)
     return data
 
-class FrameProducer(CsvLogging, Producer):
+class UAVFrameProducer(CsvLogging, Producer):
   def __init__(self, consumer, loop=None):
     self.consumer = consumer
     self.uav_id = f"uav_{os.getenv('UAV_ID', str(uuid.uuid4()))}"
     self.frame_idx = 1
-    log_filename = f"logs/log_{self.__class__.__name__}_{os.getenv('SCENARIO', 'with_cloud')}.csv"
+    log_filename = f"logs/log_{self.__class__.__name__} \
+                  _{os.getenv('ARCHITECTURE')} \
+                  _{os.getenv('UAV_COUNT')}_uav \
+                  _attempt_{os.getenv('ATTEMPT')}.csv"
     CsvLogging.__init__(self, filename=log_filename)
     Producer.__init__(self, loop=loop)
 
@@ -125,8 +131,8 @@ class FrameProducer(CsvLogging, Producer):
     self.frame_idx += 1
 
 async def main():
-  consumer = FrameProducerStorage()
-  producer = FrameProducer(consumer=consumer)
+  consumer = UAVFrameProducerStorage()
+  producer = UAVFrameProducer(consumer=consumer)
   tasks = [consumer.run(), producer.run()]
   tasks = [consumer.run()]
   try:

@@ -1,18 +1,22 @@
 import asyncio
 import cv2
+import os
 
 from fogverse import Consumer, Producer, ConsumerStorage
 from fogverse.logging.logging import CsvLogging
 
-class MyStorage(Consumer, ConsumerStorage):
+class LocalPreprocessorStorage(Consumer, ConsumerStorage):
     def __init__(self, keep_messages=False):
         Consumer.__init__(self)
         ConsumerStorage.__init__(self, keep_messages=keep_messages)
 
-class MyPreprocess(CsvLogging, Producer):
+class LocalPreprocessor(CsvLogging, Producer):
     def __init__(self, consumer):
         self.consumer = consumer
-        CsvLogging.__init__(self)
+        log_filename = f"logs/log_{self.__class__.__name__} \
+                        _{os.getenv('UAV_COUNT')}_uav \
+                        _attempt_{os.getenv('ATTEMPT')}.csv"
+        CsvLogging.__init__(self, filename=log_filename)
         Producer.__init__(self)
 
     async def receive(self):
@@ -28,8 +32,8 @@ class MyPreprocess(CsvLogging, Producer):
                                                data)
 
 async def main():
-    consumer = MyStorage()
-    producer = MyPreprocess(consumer)
+    consumer = LocalPreprocessorStorage()
+    producer = LocalPreprocessor(consumer)
     tasks = [consumer.run(), producer.run()]
     try:
         await asyncio.gather(*tasks)

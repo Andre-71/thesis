@@ -9,7 +9,9 @@ services:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094
       - CONSUMER_TOPIC=input
-      - SCENARIO=with_cloud
+      - ARCHITECTURE=with_cloud
+      - UAV_COUNT=1
+      - ATTEMPT=1
     restart: always
     network_mode: host
 
@@ -22,6 +24,8 @@ services:
       - PRODUCER_SERVERS=localhost:9094
       - CONSUMER_TOPIC=input
       - PRODUCER_TOPIC=preprocessed
+      - UAV_COUNT=1
+      - ATTEMPT=1
     restart: always
     network_mode: host
 
@@ -35,6 +39,8 @@ services:
       - CONSUMER_TOPIC=preprocessed
       - PRODUCER_TOPIC=preprocessed
       - ROLE=local2cloud
+      - UAV_COUNT=1
+      - ATTEMPT=1
     restart: always
     network_mode: host
 
@@ -48,13 +54,13 @@ services:
       - CONSUMER_TOPIC=result
       - PRODUCER_TOPIC=result
       - ROLE=cloud2local
+      - UAV_COUNT=1
+      - ATTEMPT=1
     restart: always
     network_mode: host
 
   merger:
     image: muhandre/fogverse:merger
-    volumes:
-      - ./merger/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094
