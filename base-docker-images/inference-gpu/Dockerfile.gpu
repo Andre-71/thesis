@@ -1,0 +1,13 @@
+FROM muhandre/pytorch:23.04-py3-yolov5-gpu
+
+RUN --mount=type=cache,target=/var/cache/apt_update apt update \
+    && apt install -y --no-install-recommends \
+    libssl-dev \
+    zlib1g-dev \
+    curl \
+    gcc \
+    vim \
+    g++
+
+RUN pip3 install --upgrade pip setuptools wheel
+RUN pip3 install pandas aiokafka

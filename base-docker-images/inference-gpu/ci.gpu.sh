@@ -1,0 +1,1 @@
+docker buildx build --platform linux/amd64 -t muhandre/fogverse:inference-gpu -f base-docker-images/inference-gpu/Dockerfile.gpu .

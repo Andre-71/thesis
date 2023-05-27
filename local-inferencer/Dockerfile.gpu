@@ -1,7 +1,7 @@
-FROM muhandre/fogverse:inference-cpu
+FROM muhandre/fogverse:inference-gpu
 
 WORKDIR /app
 COPY fogverse/ fogverse/
-RUN pip install psutil ultralytics
+RUN pip install ultralytics gitpython
 COPY local-inferencer/main.py .
 CMD ["python", "main.py"]

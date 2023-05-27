@@ -1,0 +1,24 @@
+ARG IMAGE=nvcr.io/nvidia/pytorch:23.04-py3
+FROM $IMAGE as build
+
+RUN apt-get update \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --upgrade pip \
+    opencv-python
+
+RUN pip3 install pandas \
+    matplotlib \
+    PyYAML \
+    requests \
+    scipy \
+    tqdm \
+    tensorboard \
+    seaborn
+
+RUN pip3 install scikit-learn
+
+FROM $IMAGE
+
+RUN apt-get update \
+    && rm -rf /var/lib/apt/lists/*

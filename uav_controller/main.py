@@ -52,10 +52,7 @@ def uav_controller(uav):
       continue
 
 def battery_consumption_logger(event):
-  battery_consumption_logger_csvfilename = f"logs/log_uavcontrollerdevice_battery_consumption \
-                                          _{os.getenv('ARCHITECTURE')} \
-                                          _{os.getenv('UAV_COUNT')}_uav \
-                                          _attempt_{os.getenv('ATTEMPT')}.csv"
+  battery_consumption_logger_csvfilename = f"logs/log_uavcontrollerdevice_battery_consumption_{os.getenv('ARCHITECTURE')}_{os.getenv('UAV_COUNT')}_uav_attempt_{os.getenv('ATTEMPT')}.csv"
   with open(battery_consumption_logger_csvfilename, 'w', encoding='UTF8', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(['time', 'battery_percentage'])
@@ -85,10 +82,10 @@ class UAVFrameConsumer(AbstractConsumer):
   async def receive(self):
     return await self._loop.run_in_executor(self._executor, self._receive)
   
-  def process(self, data):
-    cv2.imshow("Image from UAV", data)
-    cv2.waitKey(1)
-    return data
+  # def process(self, data):
+  #   cv2.imshow("Image from UAV", data)
+  #   cv2.waitKey(1)
+  #   return data
 
   def close_consumer(self):
     self.event.set()
@@ -111,10 +108,7 @@ class UAVFrameProducer(CsvLogging, Producer):
     self.consumer = consumer
     self.uav_id = f"uav_{os.getenv('UAV_ID', str(uuid.uuid4()))}"
     self.frame_idx = 1
-    log_filename = f"logs/log_{self.__class__.__name__} \
-                  _{os.getenv('ARCHITECTURE')} \
-                  _{os.getenv('UAV_COUNT')}_uav \
-                  _attempt_{os.getenv('ATTEMPT')}.csv"
+    log_filename = f"logs/log_{self.__class__.__name__}_{os.getenv('ARCHITECTURE')}_{os.getenv('UAV_COUNT')}_uav_attempt_{os.getenv('ATTEMPT')}.csv"
     CsvLogging.__init__(self, filename=log_filename)
     Producer.__init__(self, loop=loop)
 
@@ -134,7 +128,6 @@ async def main():
   consumer = UAVFrameProducerStorage()
   producer = UAVFrameProducer(consumer=consumer)
   tasks = [consumer.run(), producer.run()]
-  tasks = [consumer.run()]
   try:
     await asyncio.gather(*tasks)
   except:

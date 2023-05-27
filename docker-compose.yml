@@ -1,15 +1,29 @@
 version: "3"
 
 services:
-  local-inferencer:
-    image: muhandre/fogverse:local-inferencer
-    volumes:
-      - ./local-inferencer/logs/:/app/logs/
+  local-inferencer-cpu:
+    image: muhandre/fogverse:local-inferencer-cpu
+    # volumes:
+    #   - ./local-inferencer/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094
       - CONSUMER_TOPIC=input
-      - ARCHITECTURE=with_cloud
+      - ARCHITECTURE=only_local
+      - UAV_COUNT=1
+      - ATTEMPT=1
+    restart: always
+    network_mode: host
+  
+  local-inferencer-gpu:
+    image: muhandre/fogverse:local-inferencer-gpu
+    # volumes:
+    #   - ./local-inferencer/logs/:/app/logs/
+    environment:
+      - CONSUMER_SERVERS=localhost:9094
+      - PRODUCER_SERVERS=localhost:9094
+      - CONSUMER_TOPIC=input
+      - ARCHITECTURE=only_local
       - UAV_COUNT=1
       - ATTEMPT=1
     restart: always
@@ -18,7 +32,8 @@ services:
       resources:
         reservations:
           devices:
-            - capabilities: [gpu]
+            - capabilities: ["gpu"]
+              device_ids: ['0']
 
   local-preprocess:
     image: muhandre/fogverse:local-preprocessor
