@@ -9,10 +9,7 @@ class LocalForwarder(CsvLogging, Consumer, Producer):
     def __init__(self):
         self.auto_decode = False
         self.auto_encode = False
-        log_filename = f"logs/log_{self.__class__.__name__} \
-                        _{os.getenv('ROLE')} \
-                        _{os.getenv('UAV_COUNT')}_uav \
-                        _attempt_{os.getenv('ATTEMPT')}.csv"
+        log_filename = f"logs/log_{self.__class__.__name__}_{os.getenv('ROLE')}_with_cloud_{os.getenv('UAV_COUNT')}_uav_attempt_{os.getenv('ATTEMPT')}.csv"
         CsvLogging.__init__(self, filename=log_filename)
         Consumer.__init__(self)
         Producer.__init__(self)

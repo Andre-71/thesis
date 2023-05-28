@@ -12,49 +12,7 @@ import keyboard
 import psutil
 import time
 import csv
-
-def uav_controller(uav):
-  takeoff_status = False
-  try:
-    while True:
-      if takeoff_status == False and keyboard.is_pressed("f"):
-        print("f key pressed")
-        uav.takeoff()
-        takeoff_status = True
-      elif takeoff_status == True and keyboard.is_pressed("w"):
-        print("w key pressed")
-        uav.move_forward(30)
-      elif takeoff_status == True and keyboard.is_pressed("s"):
-        print("s key pressed")
-        uav.move_back(30)
-      elif takeoff_status == True and keyboard.is_pressed("a"):
-        print("a key pressed")
-        uav.move_left(30)
-      elif takeoff_status == True and keyboard.is_pressed("d"):
-        print("d key pressed")
-        uav.move_right(30)
-      elif takeoff_status == True and keyboard.is_pressed("l"):
-        print("l key pressed")
-        uav.rotate_clockwise(30)
-      elif takeoff_status == True and keyboard.is_pressed("j"):
-        print("j key pressed")
-        uav.rotate_counter_clockwise(30)
-      elif takeoff_status == True and keyboard.is_pressed("i"):
-        print("i key pressed")
-        uav.move_up(30)
-      elif takeoff_status == True and keyboard.is_pressed("k"):
-        print("k key pressed")
-        uav.move_down(30)
-      elif takeoff_status == True and keyboard.is_pressed("h"):
-        print("h key pressed")
-        uav.land()
-        takeoff_status = False
-      else:
-        time.sleep(0.2)
-        continue
-  except Exception as e:
-      raise e
-
+        
 def battery_consumption_logger(event):
   battery_consumption_logger_csvfilename = f"logs/log_uavcontrollerdevice_battery_consumption_{os.getenv('ARCHITECTURE')}_{os.getenv('UAV_COUNT')}_uav_attempt_{os.getenv('ATTEMPT')}.csv"
   with open(battery_consumption_logger_csvfilename, 'w', encoding='UTF8', newline='') as f:
@@ -77,12 +35,12 @@ class UAVFrameConsumer(AbstractConsumer):
     self.event = Event()
     Thread(target=battery_consumption_logger, args=(self.event,)).start()
     self.consumer.connect()
-    Thread(target=uav_controller, args=(self.consumer, )).start()
+    self.takeoff_status = False
     self.consumer.streamon()
-    self.frame_reader = self.consumer.get_frame_read()
+    self.frame_read = self.consumer.get_frame_read()
 
   def _receive(self):
-    return self.frame_reader.frame
+    return self.frame_read.frame
 
   async def receive(self):
     return await self._loop.run_in_executor(self._executor, self._receive)
@@ -90,8 +48,40 @@ class UAVFrameConsumer(AbstractConsumer):
   # Maybe i want to keep this, just in case, if the whole system involve more than 2 UAV, 
   # it will be less real time and client feel discomfort because of the low fps.
   def process(self, data):
-    cv2.imshow("Image from UAV", data)
-    cv2.waitKey(1)
+    if self.takeoff_status == False and keyboard.is_pressed("f"):
+        print("f key pressed")
+        self.consumer.takeoff()
+        self.takeoff_status = True
+    elif self.takeoff_status == True and keyboard.is_pressed("w"):
+        print("w key pressed")
+        self.consumer.move_forward(30)
+    elif self.takeoff_status == True and keyboard.is_pressed("s"):
+        print("s key pressed")
+        self.consumer.move_back(30)
+    elif self.takeoff_status == True and keyboard.is_pressed("a"):
+        print("a key pressed")
+        self.consumer.move_left(30)
+    elif self.takeoff_status == True and keyboard.is_pressed("d"):
+        print("d key pressed")
+        self.consumer.move_right(30)
+    elif self.takeoff_status == True and keyboard.is_pressed("l"):
+        print("l key pressed")
+        self.consumer.rotate_clockwise(30)
+    elif self.takeoff_status == True and keyboard.is_pressed("j"):
+        print("j key pressed")
+        self.consumer.rotate_counter_clockwise(30)
+    elif self.takeoff_status == True and keyboard.is_pressed("i"):
+        print("i key pressed")
+        self.consumer.move_up(30)
+    elif self.takeoff_status == True and keyboard.is_pressed("k"):
+        print("k key pressed")
+        self.consumer.move_down(30)
+    elif self.takeoff_status == True and keyboard.is_pressed("h"):
+        print("h key pressed")
+        self.consumer.land()
+        self.takeoff_status = False
+    # cv2.imshow("Image from UAV", data)
+    # cv2.waitKey(1)
     return data
 
   def close_consumer(self):

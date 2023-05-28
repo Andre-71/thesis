@@ -13,7 +13,7 @@ import psutil
 import time
 import csv
 
-def uav_controller(uav):
+async def uav_controller(uav):
   takeoff_status = False
   try:
     while True:
@@ -50,11 +50,10 @@ def uav_controller(uav):
         uav.land()
         takeoff_status = False
       else:
-        time.sleep(0.2)
         continue
   except Exception as e:
       raise e
-
+        
 def battery_consumption_logger(event):
   battery_consumption_logger_csvfilename = f"logs/log_uavcontrollerdevice_battery_consumption_{os.getenv('ARCHITECTURE')}_{os.getenv('UAV_COUNT')}_uav_attempt_{os.getenv('ATTEMPT')}.csv"
   with open(battery_consumption_logger_csvfilename, 'w', encoding='UTF8', newline='') as f:
@@ -67,22 +66,21 @@ def battery_consumption_logger(event):
       time.sleep(1)
 
 class UAVFrameConsumer(AbstractConsumer):
-  def __init__(self, loop=None, executor=None):
+  def __init__(self, uav, loop=None, executor=None):
     self._loop = loop or asyncio.get_event_loop()
     self._executor = executor
     self.auto_decode = False
-    self.consumer = tello.Tello()
+    self.consumer = uav
         
   def start_consumer(self):
     self.event = Event()
     Thread(target=battery_consumption_logger, args=(self.event,)).start()
-    self.consumer.connect()
-    Thread(target=uav_controller, args=(self.consumer, )).start()
-    self.consumer.streamon()
-    self.frame_reader = self.consumer.get_frame_read()
+    self.consumer.streamon() 
+    print("halo")
 
   def _receive(self):
-    return self.frame_reader.frame
+    print("oii")
+    return self.consumer.get_frame_read().frame
 
   async def receive(self):
     return await self._loop.run_in_executor(self._executor, self._receive)
@@ -97,12 +95,12 @@ class UAVFrameConsumer(AbstractConsumer):
   def close_consumer(self):
     self.event.set()
     self.consumer.streamoff()
-    self.consumer.end()
 
 class UAVFrameProducerStorage(UAVFrameConsumer, ConsumerStorage):
-  def __init__(self):
+  def __init__(self, uav):
     self.frame_size = (640, 480)
-    UAVFrameConsumer.__init__(self)
+    self.consumer = uav
+    UAVFrameConsumer.__init__(self, uav=uav)
     ConsumerStorage.__init__(self)
   
   def process(self, data):
@@ -132,14 +130,20 @@ class UAVFrameProducer(CsvLogging, Producer):
     self.frame_idx += 1
 
 async def main():
-  consumer = UAVFrameProducerStorage()
+  uav = tello.Tello()
+  uav.connect()
+  # uav.streamon()
+  consumer = UAVFrameProducerStorage(uav=uav)
   producer = UAVFrameProducer(consumer=consumer)
-  tasks = [consumer.run(), producer.run()]
+#   tasks = [consumer.run(), producer.run()]
+  tasks = [consumer.run(), producer.run(), uav_controller(uav)]
   try:
     await asyncio.gather(*tasks)
   except:
     for t in tasks:
       t.close()
+    # uav.streamoff()
+    uav.end()
 
 if __name__ == '__main__':
   load_dotenv()

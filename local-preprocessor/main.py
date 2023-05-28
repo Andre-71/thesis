@@ -13,9 +13,7 @@ class LocalPreprocessorStorage(Consumer, ConsumerStorage):
 class LocalPreprocessor(CsvLogging, Producer):
     def __init__(self, consumer):
         self.consumer = consumer
-        log_filename = f"logs/log_{self.__class__.__name__} \
-                        _{os.getenv('UAV_COUNT')}_uav \
-                        _attempt_{os.getenv('ATTEMPT')}.csv"
+        log_filename = f"logs/log_{self.__class__.__name__}_with_cloud_{os.getenv('UAV_COUNT')}_uav_attempt_{os.getenv('ATTEMPT')}.csv"
         CsvLogging.__init__(self, filename=log_filename)
         Producer.__init__(self)
 

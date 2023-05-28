@@ -13,48 +13,48 @@ import psutil
 import time
 import csv
 
-def uav_controller(uav):
-  takeoff_status = False
-  try:
-    while True:
-      if takeoff_status == False and keyboard.is_pressed("f"):
-        print("f key pressed")
-        uav.takeoff()
-        takeoff_status = True
-      elif takeoff_status == True and keyboard.is_pressed("w"):
-        print("w key pressed")
-        uav.move_forward(30)
-      elif takeoff_status == True and keyboard.is_pressed("s"):
-        print("s key pressed")
-        uav.move_back(30)
-      elif takeoff_status == True and keyboard.is_pressed("a"):
-        print("a key pressed")
-        uav.move_left(30)
-      elif takeoff_status == True and keyboard.is_pressed("d"):
-        print("d key pressed")
-        uav.move_right(30)
-      elif takeoff_status == True and keyboard.is_pressed("l"):
-        print("l key pressed")
-        uav.rotate_clockwise(30)
-      elif takeoff_status == True and keyboard.is_pressed("j"):
-        print("j key pressed")
-        uav.rotate_counter_clockwise(30)
-      elif takeoff_status == True and keyboard.is_pressed("i"):
-        print("i key pressed")
-        uav.move_up(30)
-      elif takeoff_status == True and keyboard.is_pressed("k"):
-        print("k key pressed")
-        uav.move_down(30)
-      elif takeoff_status == True and keyboard.is_pressed("h"):
-        print("h key pressed")
-        uav.land()
-        takeoff_status = False
-      else:
-        time.sleep(0.2)
-        continue
-  except Exception as e:
-      raise e
+class UAVController():
+  def __init__(self, uav):
+    self.uav = uav
+    self.takeoff_status = False   
 
+  async def run(self):
+    while True:
+      if self.takeoff_status == False and keyboard.is_pressed("f"):
+          print("f key pressed")
+          self.uav.takeoff()
+          self.takeoff_status = True
+      elif self.takeoff_status == True and keyboard.is_pressed("w"):
+          print("w key pressed")
+          self.uav.move_forward(30)
+      elif self.takeoff_status == True and keyboard.is_pressed("s"):
+          print("s key pressed")
+          self.uav.move_back(30)
+      elif self.takeoff_status == True and keyboard.is_pressed("a"):
+          print("a key pressed")
+          self.uav.move_left(30)
+      elif self.takeoff_status == True and keyboard.is_pressed("d"):
+          print("d key pressed")
+          self.uav.move_right(30)
+      elif self.takeoff_status == True and keyboard.is_pressed("l"):
+          print("l key pressed")
+          self.uav.rotate_clockwise(30)
+      elif self.takeoff_status == True and keyboard.is_pressed("j"):
+          print("j key pressed")
+          self.uav.rotate_counter_clockwise(30)
+      elif self.takeoff_status == True and keyboard.is_pressed("i"):
+          print("i key pressed")
+          self.uav.move_up(30)
+      elif self.takeoff_status == True and keyboard.is_pressed("k"):
+          print("k key pressed")
+          self.uav.move_down(30)
+      elif self.takeoff_status == True and keyboard.is_pressed("h"):
+          print("h key pressed")
+          self.uav.land()
+          self.takeoff_status = False
+      else:
+          continue
+        
 def battery_consumption_logger(event):
   battery_consumption_logger_csvfilename = f"logs/log_uavcontrollerdevice_battery_consumption_{os.getenv('ARCHITECTURE')}_{os.getenv('UAV_COUNT')}_uav_attempt_{os.getenv('ATTEMPT')}.csv"
   with open(battery_consumption_logger_csvfilename, 'w', encoding='UTF8', newline='') as f:
@@ -67,22 +67,21 @@ def battery_consumption_logger(event):
       time.sleep(1)
 
 class UAVFrameConsumer(AbstractConsumer):
-  def __init__(self, loop=None, executor=None):
+  def __init__(self, uav, loop=None, executor=None):
     self._loop = loop or asyncio.get_event_loop()
     self._executor = executor
     self.auto_decode = False
-    self.consumer = tello.Tello()
+    self.consumer = uav
         
   def start_consumer(self):
     self.event = Event()
     Thread(target=battery_consumption_logger, args=(self.event,)).start()
-    self.consumer.connect()
-    Thread(target=uav_controller, args=(self.consumer, )).start()
-    self.consumer.streamon()
-    self.frame_reader = self.consumer.get_frame_read()
+    self.consumer.streamon() 
+    print("halo")
 
   def _receive(self):
-    return self.frame_reader.frame
+    print("oii")
+    return self.consumer.get_frame_read().frame
 
   async def receive(self):
     return await self._loop.run_in_executor(self._executor, self._receive)
@@ -97,12 +96,12 @@ class UAVFrameConsumer(AbstractConsumer):
   def close_consumer(self):
     self.event.set()
     self.consumer.streamoff()
-    self.consumer.end()
 
 class UAVFrameProducerStorage(UAVFrameConsumer, ConsumerStorage):
-  def __init__(self):
+  def __init__(self, uav):
     self.frame_size = (640, 480)
-    UAVFrameConsumer.__init__(self)
+    self.consumer = uav
+    UAVFrameConsumer.__init__(self, uav=uav)
     ConsumerStorage.__init__(self)
   
   def process(self, data):
@@ -132,14 +131,21 @@ class UAVFrameProducer(CsvLogging, Producer):
     self.frame_idx += 1
 
 async def main():
-  consumer = UAVFrameProducerStorage()
+  uav = tello.Tello()
+  uav.connect()
+  # uav.streamon()
+  controller = UAVController(uav=uav)
+  consumer = UAVFrameProducerStorage(uav=uav)
   producer = UAVFrameProducer(consumer=consumer)
-  tasks = [consumer.run(), producer.run()]
+#   tasks = [consumer.run(), producer.run()]
+  tasks = [controller.run(), consumer.run(), producer.run()]
   try:
     await asyncio.gather(*tasks)
   except:
     for t in tasks:
       t.close()
+    # uav.streamoff()
+    uav.end()
 
 if __name__ == '__main__':
   load_dotenv()

@@ -15,6 +15,7 @@ class LocalInferencer(CsvLogging, Producer):
     def __init__(self, consumer):
         model =  os.getenv('MODEL', 'yolov5n')
         self.model = torch.hub.load('ultralytics/yolov5', model)
+        self.model.classes = [0]
         self.consumer = consumer
         log_filename = f"logs/log_{self.__class__.__name__}_{os.getenv('ARCHITECTURE')}_{os.getenv('UAV_COUNT')}_uav_attempt_{os.getenv('ATTEMPT')}.csv"
         CsvLogging.__init__(self, filename=log_filename)

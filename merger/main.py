@@ -175,9 +175,7 @@ class MergerProducer(Producer, CsvLogging):
         self.n_avg_delay = 0
         self.thresh = int(os.getenv('WAIT_THRESH', 2000))
         self._loop = loop or asyncio.get_event_loop()
-        log_filename = f"logs/log_{self.__class__.__name__} \
-                        _{os.getenv('UAV_COUNT')}_uav \
-                        _attempt_{os.getenv('ATTEMPT')}.csv"
+        log_filename = f"logs/log_{self.__class__.__name__}_with_cloud_{os.getenv('UAV_COUNT')}_uav_attempt_{os.getenv('ATTEMPT')}.csv"
         CsvLogging.__init__(self, filename=log_filename)
         Producer.__init__(self)
 
