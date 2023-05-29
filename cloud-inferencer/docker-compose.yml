@@ -6,12 +6,9 @@ services:
     volumes:
       - ./logs/:/app/logs/
     environment:
-      - CONSUMER_SERVERS=10.184.0.4:9094
-      - PRODUCER_SERVERS=10.184.0.4:9094
+      - CONSUMER_SERVERS=10.184.0.11:9094
+      - PRODUCER_SERVERS=10.184.0.11:9094
       - CONSUMER_TOPIC=preprocessed
       - PRODUCER_TOPIC=result
       - UAV_COUNT=1
       - ATTEMPT=1
-    restart: always
-    cpus: 0.75
-    mem_limit: 500M

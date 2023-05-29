@@ -4,7 +4,7 @@ services:
   local-inferencer:
     image: muhandre/fogverse:local-inferencer
     volumes:
-      - ./local-inferencer/logs/gpu/:/app/logs/
+      - ./local-inferencer/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094
@@ -40,7 +40,7 @@ services:
       - ./forwarder/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9094
-      - PRODUCER_SERVERS=34.101.148.109:9095
+      - PRODUCER_SERVERS=34.101.190.243:9095
       - CONSUMER_TOPIC=preprocessed
       - PRODUCER_TOPIC=preprocessed
       - ROLE=local2cloud
@@ -54,7 +54,7 @@ services:
     volumes:
       - ./forwarder/logs/:/app/logs/
     environment:
-      - CONSUMER_SERVERS=34.101.148.109:9095
+      - CONSUMER_SERVERS=34.101.190.243:9095
       - PRODUCER_SERVERS=localhost:9094
       - CONSUMER_TOPIC=result
       - PRODUCER_TOPIC=result
@@ -71,7 +71,7 @@ services:
     environment:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094
-      - WAIT_THRESH=3000
+      - WAIT_THRESH=4000
       - UAV_COUNT=1
       - ATTEMPT=1
     restart: always
