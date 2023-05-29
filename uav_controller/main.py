@@ -49,9 +49,7 @@ def uav_controller(uav):
         print("h key pressed")
         uav.land()
         takeoff_status = False
-      else:
-        time.sleep(0.2)
-        continue
+      time.sleep(0.1)
   except Exception as e:
       raise e
 
