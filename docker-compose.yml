@@ -9,9 +9,7 @@ services:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094
       - CONSUMER_TOPIC=input
-      - ARCHITECTURE=with_cloud
-      - UAV_COUNT=1
-      - ATTEMPT=1
+      - ARCHITECTURE=only_local
     restart: always
     network_mode: host
     deploy:
@@ -20,7 +18,7 @@ services:
           devices:
             - capabilities: ["gpu"]
 
-  local-preprocess:
+  local-preprocessor:
     image: muhandre/fogverse:local-preprocessor
     volumes:
       - ./local-preprocessor/logs/:/app/logs/
@@ -29,38 +27,32 @@ services:
       - PRODUCER_SERVERS=localhost:9094
       - CONSUMER_TOPIC=input
       - PRODUCER_TOPIC=preprocessed
-      - UAV_COUNT=1
-      - ATTEMPT=1
     restart: always
     network_mode: host
 
   local2cloud-forwarder:
     image: muhandre/fogverse:forwarder
     volumes:
-      - ./forwarder/logs/:/app/logs/
+      - ./forwarder/logs/local2cloud/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=34.101.190.243:9095
       - CONSUMER_TOPIC=preprocessed
       - PRODUCER_TOPIC=preprocessed
       - ROLE=local2cloud
-      - UAV_COUNT=1
-      - ATTEMPT=1
     restart: always
     network_mode: host
 
   cloud2local-forwarder:
     image: muhandre/fogverse:forwarder
     volumes:
-      - ./forwarder/logs/:/app/logs/
+      - ./forwarder/logs/cloud2local/:/app/logs/
     environment:
       - CONSUMER_SERVERS=34.101.190.243:9095
       - PRODUCER_SERVERS=localhost:9094
       - CONSUMER_TOPIC=result
       - PRODUCER_TOPIC=result
       - ROLE=cloud2local
-      - UAV_COUNT=1
-      - ATTEMPT=1
     restart: always
     network_mode: host
 
@@ -72,7 +64,5 @@ services:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094
       - WAIT_THRESH=4000
-      - UAV_COUNT=1
-      - ATTEMPT=1
     restart: always
     network_mode: host

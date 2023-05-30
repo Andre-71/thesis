@@ -10,5 +10,3 @@ services:
       - PRODUCER_SERVERS=10.184.0.11:9094
       - CONSUMER_TOPIC=preprocessed
       - PRODUCER_TOPIC=result
-      - UAV_COUNT=1
-      - ATTEMPT=1

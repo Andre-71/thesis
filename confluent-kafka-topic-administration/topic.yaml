@@ -5,8 +5,8 @@ server:
 topic:
   input:
     ### Just choose one "partitions" options. Don't forget to comment the other option.
-    partitions: 2 # for with_cloud ARCHITECTURE. 
-    # partitions: 1 # for only_local ARCHITECTURE.
+    # partitions: 2 # for with_cloud ARCHITECTURE. 
+    partitions: 1 # for only_local ARCHITECTURE.
     server:
       - local_kafka
     config:
@@ -34,21 +34,21 @@ topic:
   #     segment.ms: 1200
 
   ### with_cloud ARCHITECTURE topics
-  preprocessed:
-    partitions: 1
-    server:
-      - local_kafka
-      - cloud_kafka
-    config:
-      retention.ms: 2000
-      segment.bytes: 3100000
-      segment.ms: 1200
-  result:
-    partitions: 1
-    server:
-      - local_kafka
-      - cloud_kafka
-    config:
-      retention.ms: 5000
-      segment.bytes: 10000000
-      segment.ms: 1200
+  # preprocessed:
+  #   partitions: 1
+  #   server:
+  #     - local_kafka
+  #     - cloud_kafka
+  #   config:
+  #     retention.ms: 2000
+  #     segment.bytes: 3100000
+  #     segment.ms: 1200
+  # result:
+  #   partitions: 1
+  #   server:
+  #     - local_kafka
+  #     - cloud_kafka
+  #   config:
+  #     retention.ms: 5000
+  #     segment.bytes: 10000000
+  #     segment.ms: 1200

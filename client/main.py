@@ -17,14 +17,13 @@ app = Flask(__name__)
 app.register_error_handler(404, page_not_found)
 socketio = SocketIO(app)
 
-class MyClient(CsvLogging, Consumer):
+class Client(CsvLogging, Consumer):
     def __init__(self, socket: SocketIO, loop=None):
         self.socket = socket
         self.auto_encode = False
         self.consumer_conf = {'group_id': str(uuid.uuid4())}
         self.topic_pattern = os.getenv('TOPIC_PATTERN')
-        log_filename = f"logs/log_{self.__class__.__name__}_{os.getenv('ARCHITECTURE')}_{os.getenv('UAV_COUNT')}_uav_attempt_{os.getenv('ATTEMPT')}.csv"
-        CsvLogging.__init__(self, filename=log_filename)
+        CsvLogging.__init__(self)
         Consumer.__init__(self,loop=loop)
 
     async def send(self, data):
@@ -43,7 +42,7 @@ def index(uav_id=None):
     return render_template('index.html')
 
 async def main(loop):
-    consumer = MyClient(socketio, loop=loop)
+    consumer = Client(socketio, loop=loop)
     tasks = [consumer.run()]
     try:
         await asyncio.gather(*tasks)

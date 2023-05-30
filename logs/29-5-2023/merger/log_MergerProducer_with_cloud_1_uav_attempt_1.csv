@@ -1,0 +1,4 @@
+asctime,name,topic from,topic to,frame,offset received,frame delay,msg creation delay,consume time,size data received,process time,size data sent,send time,offset sent
+2023/05/29 06:28:43.712,MergerProducer,None,None,None,-1,-1,4003.16,4003.16,0.06,0.01,0.06,0.02,None
+2023/05/29 06:28:47.718,MergerProducer,None,nan,nan,-1,-1,4001.39,4001.39,0.06,0.01,0.06,0.03,nan
+2023/05/29 06:28:51.727,MergerProducer,None,nan,nan,-1,-1,4002.06,4002.06,0.06,0.02,0.06,0.03,nan
