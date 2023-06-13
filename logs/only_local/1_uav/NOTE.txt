@@ -1,0 +1,1 @@
+Log yang seharusnya dihasilkan oleh komputer SafeZone tidak dihasilkan ketika dijalankan.
