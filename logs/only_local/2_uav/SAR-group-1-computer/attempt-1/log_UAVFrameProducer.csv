@@ -1,0 +1,19 @@
+asctime,name,topic from,topic to,frame,offset received,frame delay,msg creation delay,consume time,size data received,process time,size data sent,send time,offset sent
+2023/05/31 07:28:59.715,UAVFrameProducer,None,input,1,-1,-1,0.0,3.61,921.74,0.0,921.76,28538.94,8
+2023/05/31 07:29:06.316,UAVFrameProducer,None,input,2,-1,-1,6.0,27.38,921.74,0.0,921.76,35126.56,1188
+2023/05/31 07:29:09.632,UAVFrameProducer,None,input,3,-1,-1,20.71,7.71,921.74,0.0,921.76,38407.26,17
+2023/05/31 07:29:15.101,UAVFrameProducer,None,input,5,-1,-1,0.0,6.29,921.74,0.0,921.76,15369.25,1193
+2023/05/31 07:29:15.803,UAVFrameProducer,None,input,4,-1,-1,8.0,18.99,921.74,0.0,921.76,44562.58,22
+2023/05/31 07:29:22.384,UAVFrameProducer,None,input,6,-1,-1,15.72,10.86,921.74,0.0,921.76,22625.93,1203
+2023/05/31 07:29:23.203,UAVFrameProducer,None,input,7,-1,-1,0.0,6.06,921.74,0.0,921.76,16863.77,26
+2023/05/31 07:29:30.867,UAVFrameProducer,None,input,10,-1,-1,0.0,14.43,921.74,0.0,921.76,7633.37,1208
+2023/05/31 07:29:31.872,UAVFrameProducer,None,input,8,-1,-1,0.0,7.62,921.74,0.0,921.76,22224.73,31
+2023/05/31 07:29:47.334,UAVFrameProducer,None,input,9,-1,-1,0.0,7.29,921.74,0.0,921.76,31511.24,42
+2023/05/31 07:29:48.381,UAVFrameProducer,None,input,11,-1,-1,4.01,18.02,921.74,0.0,921.76,25141.52,1218
+2023/05/31 07:29:57.421,UAVFrameProducer,None,input,12,-1,-1,12.6,9.57,921.74,0.0,921.76,34164.83,1225
+2023/05/31 07:29:57.909,UAVFrameProducer,None,input,13,-1,-1,0.0,9.22,921.74,0.0,921.76,27025.87,50
+2023/05/31 07:30:08.544,UAVFrameProducer,None,input,15,-1,-1,0.0,8.04,921.74,0.0,921.76,21179.26,1232
+2023/05/31 07:30:11.572,UAVFrameProducer,None,input,14,-1,-1,0.0,6.13,921.74,0.0,921.76,39675.08,61
+2023/05/31 07:30:23.110,UAVFrameProducer,None,input,16,-1,-1,0.0,3.73,921.74,0.0,921.76,34694.86,66
+2023/05/31 07:30:23.229,UAVFrameProducer,None,input,17,-1,-1,0.0,10.0,921.74,0.99,921.76,25292.78,1238
+2023/05/31 07:30:27.538,UAVFrameProducer,None,input,19,-1,-1,0.0,3.99,921.74,0.0,921.76,18947.0,67
