@@ -104,8 +104,8 @@ class UAVFrameProducerStorage(UAVFrameConsumer, ConsumerStorage):
     ConsumerStorage.__init__(self)
   
   def process(self, data):
-    data = super().process(data)
     data = cv2.resize(data, self.frame_size)
+    data = super().process(data)
     return data
 
 class UAVFrameProducer(CsvLogging, Producer):
