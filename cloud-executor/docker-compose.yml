@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  cloud-inferencer:
+    image: muhandre/fogverse:cloud-executor
+    volumes:
+      - ./logs/:/app/logs/
+    environment:
+      - CONSUMER_SERVERS=10.184.0.20:9094
+      - PRODUCER_SERVERS=10.184.0.20:9094
+      - CONSUMER_TOPIC=preprocessed
+      - PRODUCER_TOPIC=result

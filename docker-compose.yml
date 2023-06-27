@@ -1,15 +1,15 @@
 version: "3"
 
 services:
-  local-inferencer:
-    image: muhandre/fogverse:local-inferencer
+  local-executor:
+    image: muhandre/fogverse:local-executor-cam
     volumes:
-      - ./local-inferencer/logs/:/app/logs/
+      - ./local-executor/cam/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094
       - CONSUMER_TOPIC=input
-      - ARCHITECTURE=only_local
+      - ARCHITECTURE=with_cloud
     restart: always
     network_mode: host
     deploy:
@@ -19,9 +19,9 @@ services:
             - capabilities: ["gpu"]
 
   local-preprocessor:
-    image: muhandre/fogverse:local-preprocessor
+    image: muhandre/fogverse:local-preprocessor-pillow-compression
     volumes:
-      - ./local-preprocessor/logs/:/app/logs/
+      - ./local-preprocessor/pillow-compression/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9095
       - PRODUCER_SERVERS=localhost:9095
@@ -36,7 +36,7 @@ services:
       - ./forwarder/logs/local2cloud/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9094
-      - PRODUCER_SERVERS=34.101.190.243:9095
+      - PRODUCER_SERVERS=34.101.244.110:9095
       - CONSUMER_TOPIC=preprocessed
       - PRODUCER_TOPIC=preprocessed
       - ROLE=local2cloud
@@ -48,7 +48,7 @@ services:
     volumes:
       - ./forwarder/logs/cloud2local/:/app/logs/
     environment:
-      - CONSUMER_SERVERS=34.101.190.243:9095
+      - CONSUMER_SERVERS=34.101.244.110:9095
       - PRODUCER_SERVERS=localhost:9095
       - CONSUMER_TOPIC=result
       - PRODUCER_TOPIC=result
@@ -56,13 +56,13 @@ services:
     restart: always
     network_mode: host
 
-  merger:
-    image: muhandre/fogverse:merger
+  merger-sorter:
+    image: muhandre/fogverse:merger-sorter-cam
     volumes:
-      - ./merger/logs/:/app/logs/
+      - ./merger-sorter/cam/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094
-      - WAIT_THRESH=3000
+      - WAIT_THRESH=4000
     restart: always
     network_mode: host

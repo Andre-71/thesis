@@ -1,0 +1,1 @@
+docker buildx build --platform linux/amd64 -t muhandre/fogverse:merger-sorter-pillow-compression -f merger-sorter/pillow-compression/Dockerfile --no-cache .
