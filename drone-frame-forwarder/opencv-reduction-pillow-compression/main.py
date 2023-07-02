@@ -119,6 +119,9 @@ class UAVFrameProducer(CsvLogging, Producer):
     self.frame_idx = 1
     CsvLogging.__init__(self)
     Producer.__init__(self, loop=loop)
+
+  async def receive(self):
+    return await self.consumer.get()
   
   def encode(self, data):
     buffer = BytesIO()
@@ -126,9 +129,6 @@ class UAVFrameProducer(CsvLogging, Producer):
     image.save(buffer, format="JPEG", quality=75)
     buffer.seek(0)
     return buffer.getvalue()
-
-  async def receive(self):
-    return await self.consumer.get()
   
   async def send(self, data):
     key = str(self.frame_idx).encode()
