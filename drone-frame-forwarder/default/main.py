@@ -13,8 +13,6 @@ import psutil
 import time
 import csv
 
-import pylibjpeg
-
 def uav_controller(uav):
   takeoff_status = False
   try:
@@ -77,7 +75,7 @@ class UAVFrameConsumer(AbstractConsumer):
     self.event = Event()
     Thread(target=battery_consumption_logger, args=(self.event,)).start()
     self.consumer.connect()
-    # Thread(target=uav_controller, args=(self.consumer, )).start()
+    Thread(target=uav_controller, args=(self.consumer, )).start()
     self.consumer.streamon()
     self.frame_reader = self.consumer.get_frame_read()
 
@@ -101,41 +99,22 @@ class UAVFrameConsumer(AbstractConsumer):
 
 class UAVFrameProducerStorage(UAVFrameConsumer, ConsumerStorage):
   def __init__(self):
-    self.frame_size = (320, 240)
-    # Logging manual untuk consumer
-    # --- Mula kode ---
-    # self.test_csv_file = open("logs/log_DroneFrameForwarder_consumer.csv", "w", encoding="UTF8", newline="")
-    # self.writer = csv.writer(self.test_csv_file)
-    # self.writer.writerow(['timestamp'])
-    # --- Akhir kode ---
+    # self.frame_size = (256, 192)
+    # self.frame_size = (272, 204)
+    # self.frame_size = (288, 216)
+    # self.frame_size = (320, 240)
+    # self.frame_size = (336, 252)
+    # self.frame_size = (352, 264)
+    # self.frame_size = (400, 300)
+    # self.frame_size = (480, 360)
+    self.frame_size = (640, 480)
     UAVFrameConsumer.__init__(self)
     ConsumerStorage.__init__(self)
   
   def process(self, data):
-    ### Default code
-    data = cv2.resize(data, self.frame_size)
-    # data = super().process(data)
-    # return data
-
-    ### Super Resolution
-    # data = cv2.resize(data, self.frame_size)
-    # sr = cv2.dnn_superres.DnnSuperResImpl_create()
-    # path = "ESPCN_x2.pb"
-    # sr.readModel(path)
-    # sr.setModel("espcn", 2)
-    # result = sr.upsample(data)
-    # super().process(result)
-
-    result = cv2.resize(data, (640, 480))
-    super().process(result)
-
+    data = cv2.resize(data, self.frame_size, interpolation=cv2.INTER_AREA)
+    data = super().process(data)
     return data
-  
-  # def _after_send(self, data):
-  #   self.writer.writerow([get_timestamp_str()])
-  
-  # def close_consumer(self):
-  #   self.test_csv_file.close()
 
 class UAVFrameProducer(CsvLogging, Producer):
   def __init__(self, consumer, loop=None):
@@ -148,9 +127,6 @@ class UAVFrameProducer(CsvLogging, Producer):
   async def receive(self):
     return await self.consumer.get()
   
-  def process(self, data):
-    return data
-  
   async def send(self, data):
     key = str(self.frame_idx).encode()
     headers = [
@@ -162,9 +138,8 @@ class UAVFrameProducer(CsvLogging, Producer):
 
 async def main():
   consumer = UAVFrameProducerStorage()
-  # producer = UAVFrameProducer(consumer=consumer)
-  # tasks = [consumer.run(), producer.run()]
-  tasks = [consumer.run()]
+  producer = UAVFrameProducer(consumer=consumer)
+  tasks = [consumer.run(), producer.run()]
   try:
     await asyncio.gather(*tasks)
   except:
