@@ -1,0 +1,1 @@
+docker buildx build --platform linux/amd64 -t muhandre/fogverse:inference-gpu-with-super-resolution-capability -f base-docker-images/inference-gpu/with-super-resolution-capability/Dockerfile.gpu .
