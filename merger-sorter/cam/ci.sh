@@ -1,1 +1,0 @@
-docker buildx build --platform linux/amd64 -t muhandre/fogverse:merger-sorter-cam -f merger-sorter/cam/Dockerfile --no-cache .

@@ -1,1 +1,0 @@
-docker buildx build --platform linux/amd64 -t muhandre/fogverse:local-inferencer-opencv-compression -f local-inferencer/opencv-compression/Dockerfile .

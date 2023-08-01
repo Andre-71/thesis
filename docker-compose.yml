@@ -2,9 +2,9 @@ version: "3"
 
 services:
   local-executor:
-    image: muhandre/fogverse:local-executor-cam
+    image: muhandre/fogverse:local-executor
     volumes:
-      - ./local-executor/cam/logs/:/app/logs/
+      - ./local-executor/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094
@@ -19,9 +19,9 @@ services:
             - capabilities: ["gpu"]
 
   local-preprocessor:
-    image: muhandre/fogverse:local-preprocessor-pillow-compression
+    image: muhandre/fogverse:local-preprocessor
     volumes:
-      - ./local-preprocessor/pillow-compression/logs/:/app/logs/
+      - ./local-preprocessor/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9095
       - PRODUCER_SERVERS=localhost:9095
@@ -57,9 +57,9 @@ services:
     network_mode: host
 
   merger-sorter:
-    image: muhandre/fogverse:merger-sorter-cam
+    image: muhandre/fogverse:merger-sorter
     volumes:
-      - ./merger-sorter/cam/logs/:/app/logs/
+      - ./merger-sorter/logs/:/app/logs/
     environment:
       - CONSUMER_SERVERS=localhost:9094
       - PRODUCER_SERVERS=localhost:9094

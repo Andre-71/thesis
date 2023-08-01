@@ -1,1 +1,0 @@
-docker buildx build --platform linux/amd64 -t muhandre/fogverse:local-inferencer-opencv-reduction-pillow-compression -f local-inferencer/opencv-reduction-pillow-compression/Dockerfile .

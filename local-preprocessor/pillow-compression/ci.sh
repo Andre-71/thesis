@@ -1,1 +1,0 @@
-docker buildx build --platform linux/amd64 -t muhandre/fogverse:local-preprocessor-pillow-compression -f local-preprocessor/pillow-compression/Dockerfile .

@@ -1,7 +1,0 @@
-FROM muhandre/fogverse:inference-cpu
-
-WORKDIR /app
-COPY fogverse/ fogverse/
-RUN pip install ultralytics psutil gitpython
-COPY local-inferencer/main.py .
-CMD ["python", "main.py"]

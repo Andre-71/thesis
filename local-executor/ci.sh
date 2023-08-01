@@ -1,0 +1,1 @@
+docker buildx build --platform linux/amd64 -t muhandre/fogverse:local-executor -f local-executor/Dockerfile .

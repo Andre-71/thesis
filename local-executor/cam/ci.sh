@@ -1,1 +1,0 @@
-docker buildx build --platform linux/amd64 -t muhandre/fogverse:local-executor-cam -f local-executor/cam/Dockerfile .

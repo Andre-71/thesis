@@ -1,0 +1,2 @@
+Beberapa attempt, battery percentage seiring waktu bertambah.
+Hal ini karena pengujian tidak sengaja dilakukan dengan kondisi baterai dicas.

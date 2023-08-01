@@ -1,1 +1,0 @@
-docker buildx build --platform linux/amd64 -t muhandre/fogverse:local-inferencer-pillow-reduction -f local-inferencer/pillow-reduction/Dockerfile .
